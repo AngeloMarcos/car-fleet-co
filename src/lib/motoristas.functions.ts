@@ -73,38 +73,6 @@ export const createMotorista = createServerFn({ method: "POST" })
     return { userId, fornecedor };
   });
 
-export const promoteToAdmin = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ email: z.string().email() }).parse(data))
-  .handler(async ({ data, context }) => {
-    // Only allow if caller is already admin OR if there are no admins yet (bootstrap).
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { count } = await supabaseAdmin
-      .from("user_roles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "admin");
-
-    const { data: myRoles } = await context.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId);
-    const isAdmin = myRoles?.some((r) => r.role === "admin");
-
-    if (!isAdmin && (count ?? 0) > 0) {
-      throw new Error("Apenas admins podem promover outros usuários.");
-    }
-
-    // Find target user by email
-    const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    if (listErr) throw new Error(listErr.message);
-    const target = list.users.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
-    if (!target) throw new Error("Usuário não encontrado. Faça login pelo menos uma vez com esse e-mail primeiro.");
-
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: target.id, role: "admin" }, { onConflict: "user_id,role" });
-    if (error) throw new Error(error.message);
-
-    return { ok: true, userId: target.id };
-  });
+// promoteToAdmin foi removido: bootstrap público era vulnerável (qualquer visitante
+// podia se promover a admin antes do operador legítimo). O primeiro admin agora é
+// criado via migration/SQL direto no banco.
