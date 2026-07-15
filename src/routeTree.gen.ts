@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
+import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated.admin.pedidos'
 import { Route as AuthenticatedAdminMotoristasRouteImport } from './routes/_authenticated.admin.motoristas'
 
 const AuthRoute = AuthRouteImport.update({
@@ -40,6 +41,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminPedidosRoute =
+  AuthenticatedAdminPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminMotoristasRoute =
   AuthenticatedAdminMotoristasRouteImport.update({
     id: '/motoristas',
@@ -52,12 +59,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
+  '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
+  '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -67,13 +76,20 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
+  '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/admin/motoristas' | '/admin/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/admin/motoristas'
+    | '/admin/pedidos'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin/motoristas' | '/admin'
+  to: '/' | '/auth' | '/admin/motoristas' | '/admin/pedidos' | '/admin'
   id:
     | '__root__'
     | '/'
@@ -81,6 +97,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/admin/motoristas'
+    | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -127,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/pedidos': {
+      id: '/_authenticated/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/motoristas': {
       id: '/_authenticated/admin/motoristas'
       path: '/motoristas'
@@ -139,11 +163,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMotoristasRoute: typeof AuthenticatedAdminMotoristasRoute
+  AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMotoristasRoute: AuthenticatedAdminMotoristasRoute,
+  AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
