@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Brand } from "@/components/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -71,10 +73,12 @@ function AuthPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="fixed top-3 right-3"><ThemeToggle /></div>
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Central de Transfers</CardTitle>
-          <CardDescription>Acesso interno — despachantes e motoristas parceiros.</CardDescription>
+          <div className="mb-2 flex justify-center"><Brand /></div>
+          <CardTitle className="text-center">Central de Transfers</CardTitle>
+          <CardDescription className="text-center">Acesso interno — despachantes e motoristas parceiros.</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
