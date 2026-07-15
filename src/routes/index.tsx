@@ -1,24 +1,41 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getMyRole } from "@/lib/auth.functions";
+import { useNavigate } from "@tanstack/react-router";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  ssr: false,
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const navigate = useNavigate();
+  const fetchRole = useServerFn(getMyRole);
+  const [msg, setMsg] = useState("Carregando…");
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        navigate({ to: "/auth", replace: true });
+        return;
+      }
+      try {
+        const { role } = await fetchRole();
+        if (role === "admin") navigate({ to: "/admin", replace: true });
+        else if (role === "motorista") navigate({ to: "/motorista", replace: true });
+        else setMsg("Sua conta ainda não tem papel atribuído. Peça a um admin para liberar seu acesso.");
+      } catch {
+        setMsg("Erro ao verificar seu acesso. Tente sair e entrar novamente.");
+      }
+    })();
+  }, [fetchRole, navigate]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen items-center justify-center bg-background p-8 text-center text-sm text-muted-foreground">
+      {msg}
     </div>
   );
 }
