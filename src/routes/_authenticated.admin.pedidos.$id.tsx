@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { STATUS_LABEL, StatusBadge, atribuirMotorista, formatDateTime, transicaoLabel as _unused, transicionarStatus, transicoesPermitidas, type PedidoStatus } from "@/lib/pedidos";
+import { STATUS_LABEL, StatusBadge, atribuirMotorista, formatDateTime, transicionarStatus, transicoesPermitidas, type PedidoStatus } from "@/lib/pedidos";
 import { gerarVoucherPDF } from "@/lib/voucher";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos/$id")({
