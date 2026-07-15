@@ -21,6 +21,7 @@ export type Database = {
           id: string
           nome: string
           tipo: string
+          updated_at: string
         }
         Insert: {
           ativo?: boolean
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           nome: string
           tipo: string
+          updated_at?: string
         }
         Update: {
           ativo?: boolean
@@ -35,6 +37,7 @@ export type Database = {
           id?: string
           nome?: string
           tipo?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -355,6 +358,7 @@ export type Database = {
       }
       fn_transicionar_status: {
         Args: {
+          _ator?: string
           _novo_status: Database["public"]["Enums"]["pedido_status"]
           _pedido_id: number
         }
