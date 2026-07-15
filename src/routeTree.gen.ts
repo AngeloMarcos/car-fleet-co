@@ -16,6 +16,7 @@ import { Route as AuthenticatedMotoristaRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedMotoristaIndexRouteImport } from './routes/_authenticated.motorista.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
+import { Route as AuthenticatedMotoristaPerfilRouteImport } from './routes/_authenticated.motorista.perfil'
 import { Route as AuthenticatedMotoristaPedidosRouteImport } from './routes/_authenticated.motorista.pedidos'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated.admin.pedidos'
 import { Route as AuthenticatedAdminMotoristasRouteImport } from './routes/_authenticated.admin.motoristas'
@@ -60,6 +61,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedMotoristaPerfilRoute =
+  AuthenticatedMotoristaPerfilRouteImport.update({
+    id: '/perfil',
+    path: '/perfil',
+    getParentRoute: () => AuthenticatedMotoristaRoute,
+  } as any)
 const AuthenticatedMotoristaPedidosRoute =
   AuthenticatedMotoristaPedidosRouteImport.update({
     id: '/pedidos',
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
+  '/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/motorista/': typeof AuthenticatedMotoristaIndexRoute
   '/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
+  '/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/motorista': typeof AuthenticatedMotoristaIndexRoute
   '/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/motoristas': typeof AuthenticatedAdminMotoristasRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/_authenticated/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
+  '/_authenticated/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/motorista/': typeof AuthenticatedMotoristaIndexRoute
   '/_authenticated/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/admin/motoristas'
     | '/admin/pedidos'
     | '/motorista/pedidos'
+    | '/motorista/perfil'
     | '/admin/'
     | '/motorista/'
     | '/admin/pedidos/$id'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/motoristas'
     | '/admin/pedidos'
     | '/motorista/pedidos'
+    | '/motorista/perfil'
     | '/admin'
     | '/motorista'
     | '/admin/pedidos/$id'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/motoristas'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/motorista/pedidos'
+    | '/_authenticated/motorista/perfil'
     | '/_authenticated/admin/'
     | '/_authenticated/motorista/'
     | '/_authenticated/admin/pedidos/$id'
@@ -263,6 +276,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/motorista/perfil': {
+      id: '/_authenticated/motorista/perfil'
+      path: '/perfil'
+      fullPath: '/motorista/perfil'
+      preLoaderRoute: typeof AuthenticatedMotoristaPerfilRouteImport
+      parentRoute: typeof AuthenticatedMotoristaRoute
     }
     '/_authenticated/motorista/pedidos': {
       id: '/_authenticated/motorista/pedidos'
@@ -374,6 +394,7 @@ const AuthenticatedMotoristaPedidosRouteWithChildren =
 
 interface AuthenticatedMotoristaRouteChildren {
   AuthenticatedMotoristaPedidosRoute: typeof AuthenticatedMotoristaPedidosRouteWithChildren
+  AuthenticatedMotoristaPerfilRoute: typeof AuthenticatedMotoristaPerfilRoute
   AuthenticatedMotoristaIndexRoute: typeof AuthenticatedMotoristaIndexRoute
 }
 
@@ -381,6 +402,7 @@ const AuthenticatedMotoristaRouteChildren: AuthenticatedMotoristaRouteChildren =
   {
     AuthenticatedMotoristaPedidosRoute:
       AuthenticatedMotoristaPedidosRouteWithChildren,
+    AuthenticatedMotoristaPerfilRoute: AuthenticatedMotoristaPerfilRoute,
     AuthenticatedMotoristaIndexRoute: AuthenticatedMotoristaIndexRoute,
   }
 
