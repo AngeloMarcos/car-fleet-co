@@ -14,16 +14,404 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      canais_venda: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          tipo: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome: string
+          tipo: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      categorias_veiculo: {
+        Row: {
+          ativo: boolean
+          capacidade_passageiros: number | null
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          capacidade_passageiros?: number | null
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          capacidade_passageiros?: number | null
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      empresas_clientes: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          documento: string | null
+          email_contato: string | null
+          id: string
+          nome: string
+          telefone_contato: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          documento?: string | null
+          email_contato?: string | null
+          id?: string
+          nome: string
+          telefone_contato?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          documento?: string | null
+          email_contato?: string | null
+          id?: string
+          nome?: string
+          telefone_contato?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fornecedores: {
+        Row: {
+          ativo: boolean
+          categoria_veiculo_id: string | null
+          cidade_atuacao: string
+          created_at: string
+          email: string | null
+          id: string
+          nome: string
+          observacoes_internas: string | null
+          regiao_atuacao: string | null
+          telefone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_veiculo_id?: string | null
+          cidade_atuacao: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome: string
+          observacoes_internas?: string | null
+          regiao_atuacao?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          categoria_veiculo_id?: string | null
+          cidade_atuacao?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome?: string
+          observacoes_internas?: string | null
+          regiao_atuacao?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fornecedores_categoria_veiculo_id_fkey"
+            columns: ["categoria_veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_veiculo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedidos: {
+        Row: {
+          canal_venda_id: string | null
+          categoria_veiculo_id: string | null
+          cidade_atendimento: string
+          codigo_fornecedor_reserva: string | null
+          codigo_reserva_canal: string | null
+          created_at: string
+          data_alteracao: string
+          data_emissao: string
+          data_hora_encontro: string
+          direcao: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id: string | null
+          fornecedor_id: string | null
+          hotel: string | null
+          id: number
+          numero_voo: string | null
+          observacao_motorista: string | null
+          observacoes_internas: string | null
+          passageiro_nome: string
+          passageiro_telefone: string | null
+          ponto_chegada: string | null
+          ponto_partida: string | null
+          status: Database["public"]["Enums"]["pedido_status"]
+          updated_at: string
+        }
+        Insert: {
+          canal_venda_id?: string | null
+          categoria_veiculo_id?: string | null
+          cidade_atendimento: string
+          codigo_fornecedor_reserva?: string | null
+          codigo_reserva_canal?: string | null
+          created_at?: string
+          data_alteracao?: string
+          data_emissao?: string
+          data_hora_encontro: string
+          direcao: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id?: string | null
+          fornecedor_id?: string | null
+          hotel?: string | null
+          id?: number
+          numero_voo?: string | null
+          observacao_motorista?: string | null
+          observacoes_internas?: string | null
+          passageiro_nome: string
+          passageiro_telefone?: string | null
+          ponto_chegada?: string | null
+          ponto_partida?: string | null
+          status?: Database["public"]["Enums"]["pedido_status"]
+          updated_at?: string
+        }
+        Update: {
+          canal_venda_id?: string | null
+          categoria_veiculo_id?: string | null
+          cidade_atendimento?: string
+          codigo_fornecedor_reserva?: string | null
+          codigo_reserva_canal?: string | null
+          created_at?: string
+          data_alteracao?: string
+          data_emissao?: string
+          data_hora_encontro?: string
+          direcao?: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id?: string | null
+          fornecedor_id?: string | null
+          hotel?: string | null
+          id?: number
+          numero_voo?: string | null
+          observacao_motorista?: string | null
+          observacoes_internas?: string | null
+          passageiro_nome?: string
+          passageiro_telefone?: string | null
+          ponto_chegada?: string | null
+          ponto_partida?: string | null
+          status?: Database["public"]["Enums"]["pedido_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_canal_venda_id_fkey"
+            columns: ["canal_venda_id"]
+            isOneToOne: false
+            referencedRelation: "canais_venda"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_categoria_veiculo_id_fkey"
+            columns: ["categoria_veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_veiculo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_empresa_cliente_id_fkey"
+            columns: ["empresa_cliente_id"]
+            isOneToOne: false
+            referencedRelation: "empresas_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedidos_historico: {
+        Row: {
+          alterado_em: string
+          alterado_por: string | null
+          id: string
+          pedido_id: number
+          status_anterior: Database["public"]["Enums"]["pedido_status"] | null
+          status_novo: Database["public"]["Enums"]["pedido_status"]
+        }
+        Insert: {
+          alterado_em?: string
+          alterado_por?: string | null
+          id?: string
+          pedido_id: number
+          status_anterior?: Database["public"]["Enums"]["pedido_status"] | null
+          status_novo: Database["public"]["Enums"]["pedido_status"]
+        }
+        Update: {
+          alterado_em?: string
+          alterado_por?: string | null
+          id?: string
+          pedido_id?: number
+          status_anterior?: Database["public"]["Enums"]["pedido_status"] | null
+          status_novo?: Database["public"]["Enums"]["pedido_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_historico_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      fn_atribuir_motorista: {
+        Args: { _fornecedor_id: string; _pedido_id: number }
+        Returns: {
+          canal_venda_id: string | null
+          categoria_veiculo_id: string | null
+          cidade_atendimento: string
+          codigo_fornecedor_reserva: string | null
+          codigo_reserva_canal: string | null
+          created_at: string
+          data_alteracao: string
+          data_emissao: string
+          data_hora_encontro: string
+          direcao: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id: string | null
+          fornecedor_id: string | null
+          hotel: string | null
+          id: number
+          numero_voo: string | null
+          observacao_motorista: string | null
+          observacoes_internas: string | null
+          passageiro_nome: string
+          passageiro_telefone: string | null
+          ponto_chegada: string | null
+          ponto_partida: string | null
+          status: Database["public"]["Enums"]["pedido_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "pedidos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      fn_transicionar_status: {
+        Args: {
+          _novo_status: Database["public"]["Enums"]["pedido_status"]
+          _pedido_id: number
+        }
+        Returns: {
+          canal_venda_id: string | null
+          categoria_veiculo_id: string | null
+          cidade_atendimento: string
+          codigo_fornecedor_reserva: string | null
+          codigo_reserva_canal: string | null
+          created_at: string
+          data_alteracao: string
+          data_emissao: string
+          data_hora_encontro: string
+          direcao: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id: string | null
+          fornecedor_id: string | null
+          hotel: string | null
+          id: number
+          numero_voo: string | null
+          observacao_motorista: string | null
+          observacoes_internas: string | null
+          passageiro_nome: string
+          passageiro_telefone: string | null
+          ponto_chegada: string | null
+          ponto_partida: string | null
+          status: Database["public"]["Enums"]["pedido_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "pedidos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "motorista"
+      pedido_direcao: "IN" | "OUT"
+      pedido_status:
+        | "pendente_liberacao"
+        | "venda_cancelada"
+        | "liberada_rede"
+        | "motorista_atribuido"
+        | "aguardando_aceite_rede"
+        | "aceita_motorista"
+        | "em_atendimento"
+        | "corrida_finalizada"
+        | "no_show_driver"
+        | "no_show_pax"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +538,21 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "motorista"],
+      pedido_direcao: ["IN", "OUT"],
+      pedido_status: [
+        "pendente_liberacao",
+        "venda_cancelada",
+        "liberada_rede",
+        "motorista_atribuido",
+        "aguardando_aceite_rede",
+        "aceita_motorista",
+        "em_atendimento",
+        "corrida_finalizada",
+        "no_show_driver",
+        "no_show_pax",
+      ],
+    },
   },
 } as const
