@@ -5,6 +5,8 @@ import { getMyRole } from "@/lib/auth.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, Search, User } from "lucide-react";
+import { Brand } from "@/components/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/_authenticated/motorista")({
   ssr: false,
@@ -36,11 +38,11 @@ function MotoristaLayout() {
   return (
     <div className="min-h-screen bg-background pb-16">
       <header className="flex items-center justify-between border-b px-4 py-3">
-        <div>
-          <h1 className="text-sm font-semibold">Central de Transfers</h1>
-          <p className="text-xs text-muted-foreground">Portal do Motorista</p>
+        <Brand />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <Button variant="ghost" size="sm" onClick={logout}><LogOut size={14} className="mr-2" />Sair</Button>
         </div>
-        <Button variant="ghost" size="sm" onClick={logout}><LogOut size={14} className="mr-2" />Sair</Button>
       </header>
       <main className="p-4"><Outlet /></main>
       <nav className="fixed bottom-0 inset-x-0 border-t bg-background grid grid-cols-3 text-xs">

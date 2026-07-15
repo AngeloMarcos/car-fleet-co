@@ -5,6 +5,8 @@ import { getMyRole } from "@/lib/auth.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, Users, Building2, Radio, Car, ClipboardList } from "lucide-react";
+import { Brand } from "@/components/brand";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -40,10 +42,11 @@ function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-muted/30">
       <aside className="w-56 border-r bg-background p-4 flex flex-col">
-        <div className="mb-6">
-          <h1 className="text-sm font-semibold">Central de Transfers</h1>
-          <p className="text-xs text-muted-foreground">Painel Admin</p>
+        <div className="mb-6 flex items-center justify-between gap-2">
+          <Brand />
+          <ThemeToggle />
         </div>
+        <div className="mb-3 text-xs text-muted-foreground">Painel Admin</div>
         <nav className="flex flex-col gap-1 text-sm">
           <NavItem to="/admin" icon={<LayoutDashboard size={16} />} label="Dashboard" />
           <NavItem to="/admin/pedidos" icon={<ClipboardList size={16} />} label="Pedidos" />
