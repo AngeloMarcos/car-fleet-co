@@ -1,10 +1,10 @@
-import { createFileRoute, Outlet, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyRole } from "@/lib/auth.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, LayoutDashboard, Search, User } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/motorista")({
   ssr: false,
@@ -34,7 +34,7 @@ function MotoristaLayout() {
   if (!ok) return <div className="p-8 text-sm text-muted-foreground">Verificando acesso…</div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16">
       <header className="flex items-center justify-between border-b px-4 py-3">
         <div>
           <h1 className="text-sm font-semibold">Central de Transfers</h1>
@@ -43,6 +43,20 @@ function MotoristaLayout() {
         <Button variant="ghost" size="sm" onClick={logout}><LogOut size={14} className="mr-2" />Sair</Button>
       </header>
       <main className="p-4"><Outlet /></main>
+      <nav className="fixed bottom-0 inset-x-0 border-t bg-background grid grid-cols-3 text-xs">
+        <TabLink to="/motorista" icon={<LayoutDashboard size={16} />} label="Início" exact />
+        <TabLink to="/motorista/pedidos" icon={<Search size={16} />} label="Pesquisar" />
+        <TabLink to="/motorista/perfil" icon={<User size={16} />} label="Perfil" />
+      </nav>
     </div>
+  );
+}
+
+function TabLink({ to, icon, label, exact }: { to: string; icon: React.ReactNode; label: string; exact?: boolean }) {
+  return (
+    <Link to={to as any} activeOptions={{ exact }}
+      className="flex flex-col items-center gap-0.5 py-2 text-muted-foreground [&.active]:text-foreground [&.active]:font-medium">
+      {icon}{label}
+    </Link>
   );
 }
