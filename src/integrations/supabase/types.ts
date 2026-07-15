@@ -356,82 +356,44 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      fn_transicionar_status:
-        | {
-            Args: {
-              _novo_status: Database["public"]["Enums"]["pedido_status"]
-              _pedido_id: number
-            }
-            Returns: {
-              canal_venda_id: string | null
-              categoria_veiculo_id: string | null
-              cidade_atendimento: string
-              codigo_fornecedor_reserva: string | null
-              codigo_reserva_canal: string | null
-              created_at: string
-              data_alteracao: string
-              data_emissao: string
-              data_hora_encontro: string
-              direcao: Database["public"]["Enums"]["pedido_direcao"]
-              empresa_cliente_id: string | null
-              fornecedor_id: string | null
-              hotel: string | null
-              id: number
-              numero_voo: string | null
-              observacao_motorista: string | null
-              observacoes_internas: string | null
-              passageiro_nome: string
-              passageiro_telefone: string | null
-              ponto_chegada: string | null
-              ponto_partida: string | null
-              status: Database["public"]["Enums"]["pedido_status"]
-              updated_at: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "pedidos"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              _ator?: string
-              _novo_status: Database["public"]["Enums"]["pedido_status"]
-              _pedido_id: number
-            }
-            Returns: {
-              canal_venda_id: string | null
-              categoria_veiculo_id: string | null
-              cidade_atendimento: string
-              codigo_fornecedor_reserva: string | null
-              codigo_reserva_canal: string | null
-              created_at: string
-              data_alteracao: string
-              data_emissao: string
-              data_hora_encontro: string
-              direcao: Database["public"]["Enums"]["pedido_direcao"]
-              empresa_cliente_id: string | null
-              fornecedor_id: string | null
-              hotel: string | null
-              id: number
-              numero_voo: string | null
-              observacao_motorista: string | null
-              observacoes_internas: string | null
-              passageiro_nome: string
-              passageiro_telefone: string | null
-              ponto_chegada: string | null
-              ponto_partida: string | null
-              status: Database["public"]["Enums"]["pedido_status"]
-              updated_at: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "pedidos"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      fn_transicionar_status: {
+        Args: {
+          _ator?: string
+          _novo_status: Database["public"]["Enums"]["pedido_status"]
+          _pedido_id: number
+        }
+        Returns: {
+          canal_venda_id: string | null
+          categoria_veiculo_id: string | null
+          cidade_atendimento: string
+          codigo_fornecedor_reserva: string | null
+          codigo_reserva_canal: string | null
+          created_at: string
+          data_alteracao: string
+          data_emissao: string
+          data_hora_encontro: string
+          direcao: Database["public"]["Enums"]["pedido_direcao"]
+          empresa_cliente_id: string | null
+          fornecedor_id: string | null
+          hotel: string | null
+          id: number
+          numero_voo: string | null
+          observacao_motorista: string | null
+          observacoes_internas: string | null
+          passageiro_nome: string
+          passageiro_telefone: string | null
+          ponto_chegada: string | null
+          ponto_partida: string | null
+          status: Database["public"]["Enums"]["pedido_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "pedidos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
