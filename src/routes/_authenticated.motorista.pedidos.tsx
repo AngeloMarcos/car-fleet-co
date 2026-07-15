@@ -11,7 +11,7 @@ import { STATUS_LABEL, STATUS_OPTIONS, StatusBadge, formatDateTime, type PedidoD
 type Row = {
   id: number; codigo_reserva_canal: string | null; cidade_atendimento: string; hotel: string | null;
   data_hora_encontro: string; direcao: PedidoDirecao; status: PedidoStatus; passageiro_nome: string;
-  canais_venda: { nome: string } | null; empresas_clientes: { nome: string } | null;
+  canais_venda: { nome: string } | null; empresa_nome: string | null;
 };
 
 export const Route = createFileRoute("/_authenticated/motorista/pedidos")({
@@ -22,20 +22,16 @@ export const Route = createFileRoute("/_authenticated/motorista/pedidos")({
 function PesquisarPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [canais, setCanais] = useState<{ id: string; nome: string }[]>([]);
-  const [empresas, setEmpresas] = useState<{ id: string; nome: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [f, setF] = useState({
     codigo: "", canal: "any", tipoData: "atividade" as "atividade" | "emissao" | "alteracao",
-    de: "", ate: "", status: "any", empresa: "any", direcao: "any", passageiro: "", cidade: "",
+    de: "", ate: "", status: "any", direcao: "any", passageiro: "", cidade: "",
   });
 
   useEffect(() => {
     (async () => {
-      const [c, e] = await Promise.all([
-        supabase.from("canais_venda").select("id,nome").eq("ativo", true).order("nome"),
-        supabase.from("empresas_clientes").select("id,nome").eq("ativo", true).order("nome"),
-      ]);
-      setCanais((c.data as any) ?? []); setEmpresas((e.data as any) ?? []);
+      const c = await supabase.from("canais_venda").select("id,nome").eq("ativo", true).order("nome");
+      setCanais((c.data as any) ?? []);
     })();
   }, []);
 
@@ -43,12 +39,11 @@ function PesquisarPage() {
     setLoading(true);
     let q = supabase.from("pedidos").select(`
       id, codigo_reserva_canal, cidade_atendimento, hotel, data_hora_encontro, direcao, status, passageiro_nome,
-      canais_venda(nome), empresas_clientes(nome)
+      empresa_nome, canais_venda(nome)
     `).order("data_hora_encontro", { ascending: false }).limit(200);
     if (f.codigo) q = q.ilike("codigo_reserva_canal", `%${f.codigo}%`);
     if (f.canal !== "any") q = q.eq("canal_venda_id", f.canal);
     if (f.status !== "any") q = q.eq("status", f.status as PedidoStatus);
-    if (f.empresa !== "any") q = q.eq("empresa_cliente_id", f.empresa);
     if (f.direcao !== "any") q = q.eq("direcao", f.direcao as PedidoDirecao);
     if (f.passageiro) q = q.ilike("passageiro_nome", `%${f.passageiro}%`);
     if (f.cidade) q = q.ilike("cidade_atendimento", `%${f.cidade}%`);
@@ -88,12 +83,6 @@ function PesquisarPage() {
           <Select value={f.canal} onValueChange={(v) => setF({ ...f, canal: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="any">Todos</SelectItem>{canais.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
-          </Select>
-        </F>
-        <F label="Empresa">
-          <Select value={f.empresa} onValueChange={(v) => setF({ ...f, empresa: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent><SelectItem value="any">Todas</SelectItem>{empresas.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
           </Select>
         </F>
         <F label="Tipo de data">
