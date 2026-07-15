@@ -20,7 +20,7 @@ function PedidoDetalhe() {
 
   async function load() {
     const { data, error } = await supabase.from("pedidos").select(`
-      *, empresas_clientes(nome), canais_venda(nome), categorias_veiculo(nome), fornecedores(nome)
+      *, canais_venda(nome), categorias_veiculo(nome), fornecedores(nome)
     `).eq("id", Number(id)).maybeSingle();
     if (error) return toast.error(error.message);
     if (!data) return toast.error("Pedido não encontrado ou sem acesso");
@@ -43,7 +43,7 @@ function PedidoDetalhe() {
     catch (e: any) { toast.error(e.message); }
   }
 
-  const voucher = { ...p, empresa: p.empresas_clientes?.nome, canal: p.canais_venda?.nome, categoria: p.categorias_veiculo?.nome, fornecedor: p.fornecedores?.nome };
+  const voucher = { ...p, empresa: p.empresa_nome, canal: p.canais_venda?.nome, categoria: p.categorias_veiculo?.nome, fornecedor: p.fornecedores?.nome };
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
@@ -67,7 +67,7 @@ function PedidoDetalhe() {
           <Info label="Voo" v={p.numero_voo} />
           <Info label="Categoria" v={p.categorias_veiculo?.nome} />
           <Info label="Código canal" v={p.codigo_reserva_canal} />
-          <Info label="Empresa" v={p.empresas_clientes?.nome} />
+          <Info label="Empresa" v={p.empresa_nome} />
         </CardContent>
       </Card>
 
