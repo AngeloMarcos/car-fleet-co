@@ -1,0 +1,130 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { STATUS_LABEL, STATUS_OPTIONS, StatusBadge, formatDateTime, type PedidoDirecao, type PedidoStatus } from "@/lib/pedidos";
+
+type Row = {
+  id: number; codigo_reserva_canal: string | null; cidade_atendimento: string; hotel: string | null;
+  data_hora_encontro: string; direcao: PedidoDirecao; status: PedidoStatus; passageiro_nome: string;
+  canais_venda: { nome: string } | null; empresas_clientes: { nome: string } | null;
+};
+
+export const Route = createFileRoute("/_authenticated/motorista/pedidos")({
+  ssr: false,
+  component: PesquisarPage,
+});
+
+function PesquisarPage() {
+  const [rows, setRows] = useState<Row[]>([]);
+  const [canais, setCanais] = useState<{ id: string; nome: string }[]>([]);
+  const [empresas, setEmpresas] = useState<{ id: string; nome: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [f, setF] = useState({
+    codigo: "", canal: "any", tipoData: "atividade" as "atividade" | "emissao" | "alteracao",
+    de: "", ate: "", status: "any", empresa: "any", direcao: "any", passageiro: "", cidade: "",
+  });
+
+  useEffect(() => {
+    (async () => {
+      const [c, e] = await Promise.all([
+        supabase.from("canais_venda").select("id,nome").eq("ativo", true).order("nome"),
+        supabase.from("empresas_clientes").select("id,nome").eq("ativo", true).order("nome"),
+      ]);
+      setCanais((c.data as any) ?? []); setEmpresas((e.data as any) ?? []);
+    })();
+  }, []);
+
+  async function load() {
+    setLoading(true);
+    let q = supabase.from("pedidos").select(`
+      id, codigo_reserva_canal, cidade_atendimento, hotel, data_hora_encontro, direcao, status, passageiro_nome,
+      canais_venda(nome), empresas_clientes(nome)
+    `).order("data_hora_encontro", { ascending: false }).limit(200);
+    if (f.codigo) q = q.ilike("codigo_reserva_canal", `%${f.codigo}%`);
+    if (f.canal !== "any") q = q.eq("canal_venda_id", f.canal);
+    if (f.status !== "any") q = q.eq("status", f.status as PedidoStatus);
+    if (f.empresa !== "any") q = q.eq("empresa_cliente_id", f.empresa);
+    if (f.direcao !== "any") q = q.eq("direcao", f.direcao as PedidoDirecao);
+    if (f.passageiro) q = q.ilike("passageiro_nome", `%${f.passageiro}%`);
+    if (f.cidade) q = q.ilike("cidade_atendimento", `%${f.cidade}%`);
+    if (f.de || f.ate) {
+      const col = f.tipoData === "atividade" ? "data_hora_encontro" : f.tipoData === "emissao" ? "data_emissao" : "data_alteracao";
+      if (f.de) q = q.gte(col, new Date(f.de).toISOString());
+      if (f.ate) { const d = new Date(f.ate); d.setHours(23,59,59,999); q = q.lte(col, d.toISOString()); }
+    }
+    const { data, error } = await q;
+    if (error) toast.error(error.message);
+    setRows((data as any) ?? []); setLoading(false);
+  }
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-3">
+      <h1 className="text-lg font-semibold">Pesquisar pedidos</h1>
+
+      <div className="rounded border bg-background p-3 grid grid-cols-2 gap-2 text-sm">
+        <F label="Código"><Input value={f.codigo} onChange={(e) => setF({ ...f, codigo: e.target.value })} /></F>
+        <F label="Passageiro"><Input value={f.passageiro} onChange={(e) => setF({ ...f, passageiro: e.target.value })} /></F>
+        <F label="Cidade"><Input value={f.cidade} onChange={(e) => setF({ ...f, cidade: e.target.value })} /></F>
+        <F label="Direção">
+          <Select value={f.direcao} onValueChange={(v) => setF({ ...f, direcao: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="any">Todas</SelectItem><SelectItem value="IN">IN</SelectItem><SelectItem value="OUT">OUT</SelectItem></SelectContent>
+          </Select>
+        </F>
+        <F label="Status">
+          <Select value={f.status} onValueChange={(v) => setF({ ...f, status: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="any">Todos</SelectItem>{STATUS_OPTIONS.map(s => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}</SelectContent>
+          </Select>
+        </F>
+        <F label="Canal">
+          <Select value={f.canal} onValueChange={(v) => setF({ ...f, canal: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="any">Todos</SelectItem>{canais.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+          </Select>
+        </F>
+        <F label="Empresa">
+          <Select value={f.empresa} onValueChange={(v) => setF({ ...f, empresa: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="any">Todas</SelectItem>{empresas.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+          </Select>
+        </F>
+        <F label="Tipo de data">
+          <Select value={f.tipoData} onValueChange={(v) => setF({ ...f, tipoData: v as any })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="atividade">Atividade</SelectItem><SelectItem value="emissao">Emissão</SelectItem><SelectItem value="alteracao">Alteração</SelectItem></SelectContent>
+          </Select>
+        </F>
+        <F label="De"><Input type="date" value={f.de} onChange={(e) => setF({ ...f, de: e.target.value })} /></F>
+        <F label="Até"><Input type="date" value={f.ate} onChange={(e) => setF({ ...f, ate: e.target.value })} /></F>
+        <div className="col-span-2"><Button className="w-full" onClick={load} disabled={loading}>{loading ? "Buscando…" : "Filtrar"}</Button></div>
+      </div>
+
+      <ul className="space-y-2">
+        {rows.length === 0 ? <li className="text-sm text-muted-foreground p-3 text-center">Nenhum pedido encontrado.</li>
+          : rows.map((r) => (
+            <li key={r.id} className="rounded border bg-background p-3 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-xs text-muted-foreground">#{r.id} · {formatDateTime(r.data_hora_encontro)} · {r.direcao}</div>
+                <div className="text-sm font-medium truncate">{r.cidade_atendimento}{r.hotel ? ` · ${r.hotel}` : ""}</div>
+                <div className="text-xs text-muted-foreground truncate">{r.passageiro_nome}</div>
+                <div className="mt-1"><StatusBadge status={r.status} /></div>
+              </div>
+              <Link to="/motorista/pedidos/$id" params={{ id: String(r.id) }} className="rounded border px-3 py-1 text-sm hover:bg-accent">Ver</Link>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+}
+
+function F({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="space-y-1"><Label className="text-xs">{label}</Label>{children}</div>;
+}
