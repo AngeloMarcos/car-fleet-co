@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex,nofollow" },
+      { name: "twitter:title", content: "Central de Transfers — Despacho B2B" },
+      { name: "twitter:description", content: "Sistema interno de gestão e distribuição de corridas de transfer para agências, OTAs e motoristas parceiros." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e528d325-82b2-45df-b921-2d904955a146/id-preview-70623a99--1f1419cf-f864-4291-885b-690811dc0ac5.lovable.app-1784077428452.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e528d325-82b2-45df-b921-2d904955a146/id-preview-70623a99--1f1419cf-f864-4291-885b-690811dc0ac5.lovable.app-1784077428452.png" },
     ],
     links: [
       {
