@@ -34,7 +34,10 @@ function PedidoDetalhe() {
     `).eq("id", Number(id)).maybeSingle();
     if (error) return toast.error(error.message);
     if (!data) { toast.error("Pedido não encontrado"); return; }
-    setP(data); setObs((data as any).observacoes_internas ?? "");
+    setP(data);
+    const { data: nota } = await supabase.from("pedidos_notas_internas")
+      .select("observacoes_internas").eq("pedido_id", Number(id)).maybeSingle();
+    setObs((nota as any)?.observacoes_internas ?? "");
     setNovoFornecedor((data as any).fornecedor_id ?? "");
 
     const { data: h } = await supabase.from("pedidos_historico").select("*").eq("pedido_id", Number(id)).order("created_at", { ascending: false });
@@ -56,7 +59,8 @@ function PedidoDetalhe() {
   const transicoes = transicoesPermitidas(p.status as PedidoStatus, "admin");
 
   async function salvarObs() {
-    const { error } = await supabase.from("pedidos").update({ observacoes_internas: obs }).eq("id", p.id);
+    const { error } = await supabase.from("pedidos_notas_internas")
+      .upsert({ pedido_id: p.id, observacoes_internas: obs }, { onConflict: "pedido_id" });
     if (error) return toast.error(error.message);
     toast.success("Observações salvas."); load();
   }
