@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import logoAsset from "@/assets/dias-transporte-logo.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -88,15 +89,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "robots", content: "noindex,nofollow" },
       { name: "twitter:title", content: "Central de Transfers — Despacho B2B" },
       { name: "twitter:description", content: "Sistema interno de gestão e distribuição de corridas de transfer para agências, OTAs e motoristas parceiros." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e528d325-82b2-45df-b921-2d904955a146/id-preview-70623a99--1f1419cf-f864-4291-885b-690811dc0ac5.lovable.app-1784077428452.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e528d325-82b2-45df-b921-2d904955a146/id-preview-70623a99--1f1419cf-f864-4291-885b-690811dc0ac5.lovable.app-1784077428452.png" },
+      { property: "og:image", content: logoAsset.url },
+      { name: "twitter:image", content: logoAsset.url },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: logoAsset.url, type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
