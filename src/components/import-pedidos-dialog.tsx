@@ -71,9 +71,9 @@ function matchLookup(nome: string | null | undefined, list: Lookup[]) {
 }
 
 export function ImportPedidosDialog({
-  empresas, canais, categorias, onDone,
+  canais, categorias, onDone,
 }: {
-  empresas: Lookup[]; canais: Lookup[]; categorias: Lookup[]; onDone: () => void;
+  empresas?: Lookup[]; canais: Lookup[]; categorias: Lookup[]; onDone: () => void;
 }) {
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
@@ -280,7 +280,3 @@ export function ImportPedidosDialog({
     </DialogContent>
   );
 }
-
-// Suppress unused var in destructure above
-// eslint-disable-next-line
-const _unused = empresas;
