@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { STATUS_LABEL, STATUS_OPTIONS, StatusBadge, formatDateTime, type PedidoStatus, type PedidoDirecao } from "@/lib/pedidos";
+import { ImportPedidosDialog } from "@/components/import-pedidos-dialog";
 
 type Pedido = {
   id: number;
@@ -51,6 +52,7 @@ function PedidosPage() {
   });
 
   const [openNew, setOpenNew] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
 
   async function loadLookups() {
     const [e, c, fo, ca] = await Promise.all([
@@ -123,6 +125,10 @@ function PedidosPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportCSV}>Exportar CSV</Button>
+          <Dialog open={openImport} onOpenChange={setOpenImport}>
+            <DialogTrigger asChild><Button variant="outline">Importar planilha</Button></DialogTrigger>
+            <ImportPedidosDialog canais={canais} categorias={categorias} onDone={() => { setOpenImport(false); load(); }} />
+          </Dialog>
           <Dialog open={openNew} onOpenChange={setOpenNew}>
             <DialogTrigger asChild><Button>Novo pedido</Button></DialogTrigger>
             <NovoPedidoDialog empresas={empresas} canais={canais} categorias={categorias} onDone={() => { setOpenNew(false); load(); }} />
@@ -208,12 +214,17 @@ function NovoPedidoDialog({ empresas, canais, categorias, onDone }: {
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true);
     const payload: any = { ...form };
-    ["empresa_cliente_id","canal_venda_id","categoria_veiculo_id","hotel","passageiro_telefone","ponto_partida","ponto_chegada","numero_voo","observacoes_internas","codigo_reserva_canal"]
+    const notaInterna = payload.observacoes_internas;
+    delete payload.observacoes_internas;
+    ["empresa_cliente_id","canal_venda_id","categoria_veiculo_id","hotel","passageiro_telefone","ponto_partida","ponto_chegada","numero_voo","codigo_reserva_canal"]
       .forEach((k) => { if (!payload[k]) payload[k] = null; });
     payload.data_hora_encontro = new Date(form.data_hora_encontro).toISOString();
-    const { error } = await supabase.from("pedidos").insert(payload);
+    const { data: novo, error } = await supabase.from("pedidos").insert(payload).select("id").single();
     setBusy(false);
     if (error) return toast.error(error.message);
+    if (novo && notaInterna) {
+      await supabase.from("pedidos_notas_internas").insert({ pedido_id: novo.id, observacoes_internas: notaInterna });
+    }
     toast.success("Pedido criado."); onDone();
   }
 

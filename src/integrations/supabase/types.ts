@@ -167,12 +167,12 @@ export type Database = {
           data_hora_encontro: string
           direcao: Database["public"]["Enums"]["pedido_direcao"]
           empresa_cliente_id: string | null
+          empresa_nome: string | null
           fornecedor_id: string | null
           hotel: string | null
           id: number
           numero_voo: string | null
           observacao_motorista: string | null
-          observacoes_internas: string | null
           passageiro_nome: string
           passageiro_telefone: string | null
           ponto_chegada: string | null
@@ -192,12 +192,12 @@ export type Database = {
           data_hora_encontro: string
           direcao: Database["public"]["Enums"]["pedido_direcao"]
           empresa_cliente_id?: string | null
+          empresa_nome?: string | null
           fornecedor_id?: string | null
           hotel?: string | null
           id?: number
           numero_voo?: string | null
           observacao_motorista?: string | null
-          observacoes_internas?: string | null
           passageiro_nome: string
           passageiro_telefone?: string | null
           ponto_chegada?: string | null
@@ -217,12 +217,12 @@ export type Database = {
           data_hora_encontro?: string
           direcao?: Database["public"]["Enums"]["pedido_direcao"]
           empresa_cliente_id?: string | null
+          empresa_nome?: string | null
           fornecedor_id?: string | null
           hotel?: string | null
           id?: number
           numero_voo?: string | null
           observacao_motorista?: string | null
-          observacoes_internas?: string | null
           passageiro_nome?: string
           passageiro_telefone?: string | null
           ponto_chegada?: string | null
@@ -296,6 +296,35 @@ export type Database = {
           },
         ]
       }
+      pedidos_notas_internas: {
+        Row: {
+          created_at: string
+          observacoes_internas: string | null
+          pedido_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          observacoes_internas?: string | null
+          pedido_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          observacoes_internas?: string | null
+          pedido_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_notas_internas_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: true
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -336,12 +365,12 @@ export type Database = {
           data_hora_encontro: string
           direcao: Database["public"]["Enums"]["pedido_direcao"]
           empresa_cliente_id: string | null
+          empresa_nome: string | null
           fornecedor_id: string | null
           hotel: string | null
           id: number
           numero_voo: string | null
           observacao_motorista: string | null
-          observacoes_internas: string | null
           passageiro_nome: string
           passageiro_telefone: string | null
           ponto_chegada: string | null
@@ -358,7 +387,6 @@ export type Database = {
       }
       fn_transicionar_status: {
         Args: {
-          _ator?: string
           _novo_status: Database["public"]["Enums"]["pedido_status"]
           _pedido_id: number
         }
@@ -374,12 +402,12 @@ export type Database = {
           data_hora_encontro: string
           direcao: Database["public"]["Enums"]["pedido_direcao"]
           empresa_cliente_id: string | null
+          empresa_nome: string | null
           fornecedor_id: string | null
           hotel: string | null
           id: number
           numero_voo: string | null
           observacao_motorista: string | null
-          observacoes_internas: string | null
           passageiro_nome: string
           passageiro_telefone: string | null
           ponto_chegada: string | null
