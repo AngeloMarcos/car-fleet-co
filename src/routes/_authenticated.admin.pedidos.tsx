@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { STATUS_LABEL, STATUS_OPTIONS, StatusBadge, formatDateTime, type PedidoStatus, type PedidoDirecao } from "@/lib/pedidos";
+import { ImportPedidosDialog } from "@/components/import-pedidos-dialog";
 
 type Pedido = {
   id: number;
@@ -51,6 +52,7 @@ function PedidosPage() {
   });
 
   const [openNew, setOpenNew] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
 
   async function loadLookups() {
     const [e, c, fo, ca] = await Promise.all([
@@ -123,6 +125,10 @@ function PedidosPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={exportCSV}>Exportar CSV</Button>
+          <Dialog open={openImport} onOpenChange={setOpenImport}>
+            <DialogTrigger asChild><Button variant="outline">Importar planilha</Button></DialogTrigger>
+            <ImportPedidosDialog canais={canais} categorias={categorias} onDone={() => { setOpenImport(false); load(); }} />
+          </Dialog>
           <Dialog open={openNew} onOpenChange={setOpenNew}>
             <DialogTrigger asChild><Button>Novo pedido</Button></DialogTrigger>
             <NovoPedidoDialog empresas={empresas} canais={canais} categorias={categorias} onDone={() => { setOpenNew(false); load(); }} />
