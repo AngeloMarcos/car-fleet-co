@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type PluginOption } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import viteReact from "@vitejs/plugin-react";
@@ -7,7 +7,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 export default defineConfig(async ({ command, mode }) => {
   const isDevBuild = command === "build" && mode === "development";
 
-  const plugins = [tailwindcss(), tsConfigPaths({ projects: ["./tsconfig.json"] })];
+  const plugins: PluginOption[] = [tailwindcss(), tsConfigPaths({ projects: ["./tsconfig.json"] })];
 
   if (mode === "development") {
     const { devtools } = await import("@tanstack/devtools-vite");
@@ -64,7 +64,7 @@ export default defineConfig(async ({ command, mode }) => {
     // hand-written `-webkit-backdrop-filter` to the prefixed form Chrome ignores)
     // break the built/static output while the dev preview looks fine. Running
     // Lightning CSS in both keeps the preview honest.
-    css: { transformer: "lightningcss" },
+    css: { transformer: "lightningcss" as const },
     resolve: {
       alias: {
         "@": `${process.cwd()}/src`,
