@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { createMotorista } from "@/lib/motoristas.functions";
+import { createMotorista, removerMotorista } from "@/lib/motoristas.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/admin/motoristas")({
 
 function MotoristasPage() {
   const create = useServerFn(createMotorista);
+  const remove = useServerFn(removerMotorista);
   const [rows, setRows] = useState<Fornecedor[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -33,6 +34,7 @@ function MotoristasPage() {
     nome: "", email: "", senha: "", telefone: "", cidade_atuacao: "", regiao_atuacao: "", observacoes_internas: "",
   });
   const [busy, setBusy] = useState(false);
+  const [removendo, setRemovendo] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -60,6 +62,20 @@ function MotoristasPage() {
       toast.error(e?.message ?? "Erro");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function remover(f: Fornecedor) {
+    if (!confirm(`Remover o acesso do motorista "${f.nome}"? Se ele tiver pedidos, o cadastro será desativado e o login revogado.`)) return;
+    setRemovendo(f.id);
+    try {
+      const res = await remove({ data: { fornecedor_id: f.id } });
+      toast.success(res.removido ? "Motorista removido." : "Motorista desativado e login revogado.");
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setRemovendo(null);
     }
   }
 
@@ -100,13 +116,14 @@ function MotoristasPage() {
               <TableHead>Telefone</TableHead>
               <TableHead>Cidade</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-24"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground">Carregando…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground">Carregando…</TableCell></TableRow>
             ) : rows.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground">Nenhum motorista cadastrado ainda.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground">Nenhum motorista cadastrado ainda.</TableCell></TableRow>
             ) : rows.map((f) => (
               <TableRow key={f.id}>
                 <TableCell className="font-medium">{f.nome}</TableCell>
@@ -114,6 +131,11 @@ function MotoristasPage() {
                 <TableCell>{f.telefone ?? "—"}</TableCell>
                 <TableCell>{f.cidade_atuacao}</TableCell>
                 <TableCell>{f.ativo ? "Ativo" : "Inativo"}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" disabled={removendo === f.id} onClick={() => remover(f)}>
+                    {removendo === f.id ? "…" : "Remover"}
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
