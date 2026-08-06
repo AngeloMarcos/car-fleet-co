@@ -61,7 +61,6 @@ export const createMotorista = createServerFn({ method: "POST" })
         cidade_atuacao: data.cidade_atuacao,
         regiao_atuacao: data.regiao_atuacao || null,
         categoria_veiculo_id: data.categoria_veiculo_id || null,
-        observacoes_internas: data.observacoes_internas || null,
       })
       .select()
       .single();
@@ -70,7 +69,65 @@ export const createMotorista = createServerFn({ method: "POST" })
       throw new Error(`Falha ao criar fornecedor: ${fornErr.message}`);
     }
 
+    if (data.observacoes_internas.trim()) {
+      await supabaseAdmin
+        .from("fornecedores_notas_internas")
+        .insert({ fornecedor_id: fornecedor.id, observacoes_internas: data.observacoes_internas.trim() });
+    }
+
     return { userId, fornecedor };
+  });
+
+const removeSchema = z.object({ fornecedor_id: z.string().uuid() });
+
+export const removerMotorista = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => removeSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: roles } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (!roles?.some((r) => r.role === "admin")) {
+      throw new Error("Apenas admins podem remover motoristas.");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: fornecedor, error: readErr } = await supabaseAdmin
+      .from("fornecedores")
+      .select("id, user_id")
+      .eq("id", data.fornecedor_id)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!fornecedor) throw new Error("Motorista não encontrado.");
+
+    const { count } = await supabaseAdmin
+      .from("pedidos")
+      .select("id", { count: "exact", head: true })
+      .eq("fornecedor_id", fornecedor.id);
+
+    if ((count ?? 0) > 0) {
+      // Preserva histórico: apenas desativa e revoga o acesso.
+      const { error } = await supabaseAdmin
+        .from("fornecedores")
+        .update({ ativo: false, user_id: null })
+        .eq("id", fornecedor.id);
+      if (error) throw new Error(error.message);
+      if (fornecedor.user_id) {
+        await supabaseAdmin.from("user_roles").delete().eq("user_id", fornecedor.user_id);
+        await supabaseAdmin.auth.admin.deleteUser(fornecedor.user_id);
+      }
+      return { desativado: true, removido: false };
+    }
+
+    const { error: delErr } = await supabaseAdmin.from("fornecedores").delete().eq("id", fornecedor.id);
+    if (delErr) throw new Error(delErr.message);
+    if (fornecedor.user_id) {
+      await supabaseAdmin.from("user_roles").delete().eq("user_id", fornecedor.user_id);
+      await supabaseAdmin.auth.admin.deleteUser(fornecedor.user_id);
+    }
+    return { desativado: false, removido: true };
   });
 
 // promoteToAdmin foi removido: bootstrap público era vulnerável (qualquer visitante

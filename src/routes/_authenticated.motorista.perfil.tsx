@@ -29,7 +29,14 @@ function PerfilPage() {
 
   async function salvarPerfil() {
     if (!f) return;
-    const { error } = await supabase.from("fornecedores").update({ nome: f.nome, telefone: f.telefone }).eq("id", f.id);
+    const nome = f.nome.trim();
+    const telefone = (f.telefone ?? "").trim();
+    if (nome.length < 2 || nome.length > 200) return toast.error("Informe um nome entre 2 e 200 caracteres.");
+    if (telefone.length > 120) return toast.error("Telefone muito longo.");
+    const { error } = await supabase
+      .from("fornecedores")
+      .update({ nome, telefone: telefone || null })
+      .eq("id", f.id);
     if (error) return toast.error(error.message);
     toast.success("Perfil atualizado.");
   }

@@ -110,7 +110,6 @@ export type Database = {
           email: string | null
           id: string
           nome: string
-          observacoes_internas: string | null
           regiao_atuacao: string | null
           telefone: string | null
           updated_at: string
@@ -124,7 +123,6 @@ export type Database = {
           email?: string | null
           id?: string
           nome: string
-          observacoes_internas?: string | null
           regiao_atuacao?: string | null
           telefone?: string | null
           updated_at?: string
@@ -138,7 +136,6 @@ export type Database = {
           email?: string | null
           id?: string
           nome?: string
-          observacoes_internas?: string | null
           regiao_atuacao?: string | null
           telefone?: string | null
           updated_at?: string
@@ -150,6 +147,35 @@ export type Database = {
             columns: ["categoria_veiculo_id"]
             isOneToOne: false
             referencedRelation: "categorias_veiculo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fornecedores_notas_internas: {
+        Row: {
+          created_at: string
+          fornecedor_id: string
+          observacoes_internas: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fornecedor_id: string
+          observacoes_internas?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fornecedor_id?: string
+          observacoes_internas?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fornecedores_notas_internas_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: true
+            referencedRelation: "fornecedores"
             referencedColumns: ["id"]
           },
         ]

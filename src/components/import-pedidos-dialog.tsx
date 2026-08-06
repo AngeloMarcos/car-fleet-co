@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { importarPedidos } from "@/lib/pedidos.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,6 +82,7 @@ export function ImportPedidosDialog({
   const [parsing, setParsing] = useState(false);
   const [importing, setImporting] = useState(false);
   const [fileName, setFileName] = useState<string>("");
+  const enviarImportacao = useServerFn(importarPedidos);
 
   const validCount = useMemo(() => rows.filter((r, i) => r.ok && !r.duplicate && selected[i]).length, [rows, selected]);
 
@@ -178,17 +181,17 @@ export function ImportPedidosDialog({
 
     if (payload.length === 0) return toast.error("Nenhuma linha válida selecionada.");
     setImporting(true);
-    // inserir em lotes de 100
-    let inserted = 0;
-    for (let i = 0; i < payload.length; i += 100) {
-      const chunk = payload.slice(i, i + 100);
-      const { error } = await supabase.from("pedidos").insert(chunk);
-      if (error) { setImporting(false); toast.error("Erro no lote: " + error.message); return; }
-      inserted += chunk.length;
+    try {
+      const res = await enviarImportacao({ data: { rows: payload } });
+      toast.success(
+        `${res.inseridos} pedidos importados${res.ignorados > 0 ? ` • ${res.ignorados} ignorados (duplicados)` : ""}.`,
+      );
+      onDone();
+    } catch (e: any) {
+      toast.error("Falha na importação: " + (e?.message ?? e));
+    } finally {
+      setImporting(false);
     }
-    setImporting(false);
-    toast.success(`${inserted} pedidos importados.`);
-    onDone();
   }
 
   const totalOk = rows.filter((r) => r.ok && !r.duplicate).length;
