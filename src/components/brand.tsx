@@ -1,10 +1,10 @@
-import logoAsset from "@/assets/dias-transporte-logo.png.asset.json";
+import logoAsset from "@/assets/dias-transporte-logo.png";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2">
       <img
-        src={logoAsset.url}
+        src={logoAsset}
         alt="Dias Transporte"
         className="h-9 w-9 rounded-md object-contain bg-black p-0.5"
       />
