@@ -111,7 +111,7 @@ export const removerMotorista = createServerFn({ method: "POST" })
       // Preserva histórico: apenas desativa e revoga o acesso.
       const { error } = await supabaseAdmin
         .from("fornecedores")
-        .update({ ativo: false })
+        .update({ ativo: false, user_id: null })
         .eq("id", fornecedor.id);
       if (error) throw new Error(error.message);
       if (fornecedor.user_id) {
