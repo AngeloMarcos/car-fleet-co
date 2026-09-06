@@ -78,7 +78,8 @@ export const Route = createFileRoute("/api/integracoes/dias-transporte")({
                     ${corpo.data_hora_encontro}, ${corpo.direcao}, ${corpo.passageiro_nome},
                     ${corpo.passageiro_telefone}, ${corpo.ponto_partida}, ${corpo.ponto_chegada},
                     ${categoria.id})
-            ON CONFLICT (codigo_reserva_canal) DO NOTHING
+            ON CONFLICT (codigo_reserva_canal) WHERE codigo_reserva_canal IS NOT NULL AND codigo_reserva_canal <> ''
+            DO NOTHING
             RETURNING id
           `;
           if (!criado) {
