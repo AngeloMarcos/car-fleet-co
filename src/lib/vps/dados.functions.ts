@@ -686,7 +686,10 @@ export const vpsListarCategorias = createServerFn({ method: "GET" })
 
 const categoriaSchema = z.object({
   nome: z.string().min(1),
-  capacidade_passageiros: z.number().int().nullable(),
+  // .positive(): nada validava isso antes (nem aqui, nem no banco até
+  // ck_categorias_capacidade em 0003_constraints.sql) — um admin conseguia
+  // salvar 0 ou capacidade negativa sem erro nenhum.
+  capacidade_passageiros: z.number().int().positive().nullable(),
 });
 
 export const vpsCriarCategoria = createServerFn({ method: "POST" })
