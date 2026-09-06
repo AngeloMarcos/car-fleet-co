@@ -32,7 +32,10 @@ services:
       VITE_AUTH_MODE: vps
       PORT: 3000
     ports:
-      - "127.0.0.1:3001:3000" # 3001 pra nao colidir com o Dias Transporte na mesma VPS
+      # Publicado direto (sem domínio/proxy ainda - Sprint 5 do roteiro troca
+      # isso por Caddy com HTTPS). 3001 pra nao colidir com o Dias Transporte
+      # (porta 3000) na mesma VPS. Exige liberar 3001/tcp no ufw.
+      - "3001:3000"
 
 volumes:
   db:
