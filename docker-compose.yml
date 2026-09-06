@@ -40,6 +40,32 @@ services:
       # isso por Caddy com HTTPS). 3001 pra nao colidir com o Dias Transporte
       # (porta 3000) na mesma VPS. Exige liberar 3001/tcp no ufw.
       - "3001:3000"
+    healthcheck:
+      # Sem isso "restart: unless-stopped" só reagia a um crash de verdade
+      # (processo morto) — um processo travado mas ainda de pé ficava no ar
+      # indefinidamente sem servir nada. wget por ser o único cliente HTTP
+      # disponível na imagem node:alpine (sem curl).
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    labels:
+      - autoheal=true
+
+  # "restart: unless-stopped" sozinho só reage a um container que morreu de
+  # verdade — um "unhealthy" (healthcheck falhando, processo travado mas de
+  # pé) fica parado no compose puro (sem Swarm) até alguém perceber e
+  # reiniciar à mão. Este sidecar observa containers com o label
+  # autoheal=true e reinicia os que ficarem "unhealthy" — mesmo padrão do
+  # projeto irmão Dias Transporte.
+  autoheal:
+    image: willfarrell/autoheal:1.2.0
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db:
