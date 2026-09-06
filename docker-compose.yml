@@ -31,6 +31,10 @@ services:
       APP_URL: ${APP_URL:?defina APP_URL no .env}
       VITE_AUTH_MODE: vps
       PORT: 3000
+      # Integração com o Dias Transporte (Sprint 3 do roteiro "Despacho
+      # Unificado"). Vazio = endpoint sempre responde 401 (integração
+      # desligada), não impede o resto do app de subir.
+      INTEGRACAO_DIAS_TRANSPORTE_TOKEN: ${INTEGRACAO_DIAS_TRANSPORTE_TOKEN:-}
     ports:
       # Publicado direto (sem domínio/proxy ainda - Sprint 5 do roteiro troca
       # isso por Caddy com HTTPS). 3001 pra nao colidir com o Dias Transporte

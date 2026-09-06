@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authent
 import { Route as AuthenticatedMotoristaIndexRouteImport } from './routes/_authenticated.motorista.index'
 import { Route as AuthenticatedMotoristaPedidosRouteImport } from './routes/_authenticated.motorista.pedidos'
 import { Route as AuthenticatedMotoristaPerfilRouteImport } from './routes/_authenticated.motorista.perfil'
+import { Route as ApiIntegracoesDiasTransporteRouteImport } from './routes/api/integracoes.dias-transporte'
 import { Route as AuthenticatedAdminPedidosIdRouteImport } from './routes/_authenticated.admin.pedidos.$id'
 import { Route as AuthenticatedMotoristaPedidosIdRouteImport } from './routes/_authenticated.motorista.pedidos.$id'
 
@@ -103,6 +104,12 @@ const AuthenticatedMotoristaPerfilRoute =
     path: '/perfil',
     getParentRoute: () => AuthenticatedMotoristaRoute,
   } as any)
+const ApiIntegracoesDiasTransporteRoute =
+  ApiIntegracoesDiasTransporteRouteImport.update({
+    id: '/api/integracoes/dias-transporte',
+    path: '/api/integracoes/dias-transporte',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminPedidosIdRoute =
   AuthenticatedAdminPedidosIdRouteImport.update({
     id: '/$id',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
   '/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
+  '/api/integracoes/dias-transporte': typeof ApiIntegracoesDiasTransporteRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/motorista/': typeof AuthenticatedMotoristaIndexRoute
   '/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
   '/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
+  '/api/integracoes/dias-transporte': typeof ApiIntegracoesDiasTransporteRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/motorista': typeof AuthenticatedMotoristaIndexRoute
   '/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -162,6 +171,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRouteWithChildren
   '/_authenticated/motorista/pedidos': typeof AuthenticatedMotoristaPedidosRouteWithChildren
   '/_authenticated/motorista/perfil': typeof AuthenticatedMotoristaPerfilRoute
+  '/api/integracoes/dias-transporte': typeof ApiIntegracoesDiasTransporteRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/motorista/': typeof AuthenticatedMotoristaIndexRoute
   '/_authenticated/admin/pedidos/$id': typeof AuthenticatedAdminPedidosIdRoute
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos'
     | '/motorista/pedidos'
     | '/motorista/perfil'
+    | '/api/integracoes/dias-transporte'
     | '/admin/'
     | '/motorista/'
     | '/admin/pedidos/$id'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/admin/pedidos'
     | '/motorista/pedidos'
     | '/motorista/perfil'
+    | '/api/integracoes/dias-transporte'
     | '/admin'
     | '/motorista'
     | '/admin/pedidos/$id'
@@ -214,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/motorista/pedidos'
     | '/_authenticated/motorista/perfil'
+    | '/api/integracoes/dias-transporte'
     | '/_authenticated/admin/'
     | '/_authenticated/motorista/'
     | '/_authenticated/admin/pedidos/$id'
@@ -224,6 +237,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiIntegracoesDiasTransporteRoute: typeof ApiIntegracoesDiasTransporteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -325,6 +339,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/motorista/perfil'
       preLoaderRoute: typeof AuthenticatedMotoristaPerfilRouteImport
       parentRoute: typeof AuthenticatedMotoristaRoute
+    }
+    '/api/integracoes/dias-transporte': {
+      id: '/api/integracoes/dias-transporte'
+      path: '/api/integracoes/dias-transporte'
+      fullPath: '/api/integracoes/dias-transporte'
+      preLoaderRoute: typeof ApiIntegracoesDiasTransporteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/pedidos/$id': {
       id: '/_authenticated/admin/pedidos/$id'
@@ -429,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiIntegracoesDiasTransporteRoute: ApiIntegracoesDiasTransporteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
