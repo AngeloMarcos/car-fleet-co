@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { motoristaResumo } from "@/lib/dados";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge, formatDateTime, type PedidoStatus, type PedidoDirecao } from "@/lib/pedidos";
 
@@ -19,20 +19,9 @@ function MotoristaHome() {
   const [semana, setSemana] = useState<Row[]>([]);
 
   useEffect(() => {
-    (async () => {
-      const start = new Date(); start.setHours(0,0,0,0);
-      const endHoje = new Date(); endHoje.setHours(23,59,59,999);
-      const in7 = new Date(); in7.setDate(in7.getDate() + 7); in7.setHours(23,59,59,999);
-
-      const cols = "id,cidade_atendimento,hotel,data_hora_encontro,direcao,status";
-      const { data: h } = await supabase.from("pedidos").select(cols)
-        .gte("data_hora_encontro", start.toISOString()).lte("data_hora_encontro", endHoje.toISOString())
-        .order("data_hora_encontro");
-      const { data: s } = await supabase.from("pedidos").select(cols)
-        .gt("data_hora_encontro", endHoje.toISOString()).lte("data_hora_encontro", in7.toISOString())
-        .order("data_hora_encontro");
-      setHoje((h as Row[]) ?? []); setSemana((s as Row[]) ?? []);
-    })();
+    motoristaResumo().then(({ hoje, semana }) => {
+      setHoje(hoje as Row[]); setSemana(semana as Row[]);
+    });
   }, []);
 
   return (

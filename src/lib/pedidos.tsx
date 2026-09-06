@@ -1,18 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
+import { MODO_VPS } from "@/lib/vps/config";
+import { vpsAtribuirMotorista, vpsTransicionarStatus } from "@/lib/vps/dados.functions";
 
-export type PedidoStatus =
-  | "pendente_liberacao"
-  | "venda_cancelada"
-  | "liberada_rede"
-  | "motorista_atribuido"
-  | "aguardando_aceite_rede"
-  | "aceita_motorista"
-  | "em_atendimento"
-  | "corrida_finalizada"
-  | "no_show_driver"
-  | "no_show_pax";
-
-export type PedidoDirecao = "IN" | "OUT";
+export type { PedidoStatus, PedidoDirecao } from "@/lib/pedidos-transicoes";
+export { transicoesPermitidas } from "@/lib/pedidos-transicoes";
+import type { PedidoStatus } from "@/lib/pedidos-transicoes";
 
 export const STATUS_LABEL: Record<PedidoStatus, string> = {
   pendente_liberacao: "Pendente liberação",
@@ -53,24 +45,10 @@ export const STATUS_OPTIONS: PedidoStatus[] = [
   "venda_cancelada",
 ];
 
-/** Retorna transições permitidas a partir do status atual, dado o papel. */
-export function transicoesPermitidas(
-  atual: PedidoStatus,
-  role: "admin" | "motorista",
-): PedidoStatus[] {
-  const out: PedidoStatus[] = [];
-  const isAdmin = role === "admin";
-  if (isAdmin && !["corrida_finalizada", "no_show_driver", "no_show_pax"].includes(atual))
-    out.push("venda_cancelada");
-  if (isAdmin && atual === "pendente_liberacao") out.push("liberada_rede");
-  if (isAdmin && atual === "liberada_rede") out.push("motorista_atribuido", "aguardando_aceite_rede");
-  if (["motorista_atribuido", "aguardando_aceite_rede"].includes(atual)) out.push("aceita_motorista");
-  if (atual === "aceita_motorista") out.push("em_atendimento");
-  if (atual === "em_atendimento") out.push("corrida_finalizada", "no_show_driver", "no_show_pax");
-  return out;
-}
-
 export async function transicionarStatus(pedidoId: number, novo: PedidoStatus) {
+  if (MODO_VPS) {
+    return vpsTransicionarStatus({ data: { pedidoId, novoStatus: novo } });
+  }
   const { data, error } = await supabase.rpc("fn_transicionar_status", {
     _pedido_id: pedidoId,
     _novo_status: novo,
@@ -80,6 +58,9 @@ export async function transicionarStatus(pedidoId: number, novo: PedidoStatus) {
 }
 
 export async function atribuirMotorista(pedidoId: number, fornecedorId: string) {
+  if (MODO_VPS) {
+    return vpsAtribuirMotorista({ data: { pedidoId, fornecedorId } });
+  }
   const { data, error } = await supabase.rpc("fn_atribuir_motorista", {
     _pedido_id: pedidoId,
     _fornecedor_id: fornecedorId,

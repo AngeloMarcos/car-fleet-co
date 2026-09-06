@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listarFornecedoresAtivos, pedidoDetalheAdmin, salvarNotasInternas } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,27 +29,24 @@ function PedidoDetalhe() {
   const [obs, setObs] = useState("");
 
   async function load() {
-    const { data, error } = await supabase.from("pedidos").select(`
-      *, empresas_clientes(nome), canais_venda(nome), categorias_veiculo(nome), fornecedores(id,nome)
-    `).eq("id", Number(id)).maybeSingle();
-    if (error) return toast.error(error.message);
+    let data: any;
+    try {
+      data = await pedidoDetalheAdmin(Number(id));
+    } catch (e: any) {
+      return toast.error(e?.message ?? "Erro ao carregar pedido");
+    }
     if (!data) { toast.error("Pedido não encontrado"); return; }
     setP(data);
-    const { data: nota } = await supabase.from("pedidos_notas_internas")
-      .select("observacoes_internas").eq("pedido_id", Number(id)).maybeSingle();
-    setObs((nota as any)?.observacoes_internas ?? "");
-    setNovoFornecedor((data as any).fornecedor_id ?? "");
-
-    const { data: h } = await supabase.from("pedidos_historico").select("*").eq("pedido_id", Number(id)).order("created_at", { ascending: false });
-    setHistorico((h as any) ?? []);
+    setObs(data.observacoes_internas ?? "");
+    setNovoFornecedor(data.fornecedor_id ?? "");
+    setHistorico(data.historico ?? []);
   }
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
 
   useEffect(() => {
     if (!p) return;
-    supabase.from("fornecedores").select("id,nome,cidade_atuacao").eq("ativo", true).order("nome")
-      .then(({ data }) => setFornecedores((data as any) ?? []));
+    listarFornecedoresAtivos().then(setFornecedores);
   }, [p]);
 
   if (!p) return <div className="p-8 text-sm text-muted-foreground">Carregando…</div>;
@@ -59,10 +56,12 @@ function PedidoDetalhe() {
   const transicoes = transicoesPermitidas(p.status as PedidoStatus, "admin");
 
   async function salvarObs() {
-    const { error } = await supabase.from("pedidos_notas_internas")
-      .upsert({ pedido_id: p.id, observacoes_internas: obs }, { onConflict: "pedido_id" });
-    if (error) return toast.error(error.message);
-    toast.success("Observações salvas."); load();
+    try {
+      await salvarNotasInternas(p.id, obs);
+      toast.success("Observações salvas."); load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
   async function atribuir() {
     if (!novoFornecedor) return;

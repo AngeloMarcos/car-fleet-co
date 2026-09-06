@@ -1,8 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { getMyRole } from "@/lib/auth.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { obterMeuPapel, sairSessao } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, Search, User } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -16,19 +14,18 @@ export const Route = createFileRoute("/_authenticated/motorista")({
 function MotoristaLayout() {
   const navigate = useNavigate();
   const router = useRouter();
-  const fetchRole = useServerFn(getMyRole);
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    fetchRole().then(({ role }) => {
+    obterMeuPapel().then(({ role }) => {
       if (role !== "motorista") {
         navigate({ to: role === "admin" ? "/admin" : "/auth", replace: true });
       } else setOk(true);
     });
-  }, [fetchRole, navigate]);
+  }, [navigate]);
 
   async function logout() {
-    await supabase.auth.signOut();
+    await sairSessao();
     router.invalidate();
     navigate({ to: "/auth", replace: true });
   }

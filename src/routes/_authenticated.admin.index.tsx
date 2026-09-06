@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { dashboardAdmin } from "@/lib/dados";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { STATUS_LABEL, StatusBadge, formatDateTime, type PedidoStatus } from "@/lib/pedidos";
 
@@ -15,22 +15,11 @@ function Dashboard() {
   const [semMot, setSemMot] = useState<any[]>([]);
 
   useEffect(() => {
-    (async () => {
-      const { data: all } = await supabase.from("pedidos").select("status");
-      const counts: Record<string, number> = {};
-      (all ?? []).forEach((r: any) => { counts[r.status] = (counts[r.status] ?? 0) + 1; });
-      setPorStatus(counts);
-
-      const start = new Date(); start.setHours(0,0,0,0);
-      const end = new Date(); end.setHours(23,59,59,999);
-      const { data: h } = await supabase.from("pedidos").select("id,passageiro_nome,cidade_atendimento,data_hora_encontro,status,direcao")
-        .gte("data_hora_encontro", start.toISOString()).lte("data_hora_encontro", end.toISOString()).order("data_hora_encontro");
-      setHoje(h ?? []);
-
-      const { data: sm } = await supabase.from("pedidos").select("id,passageiro_nome,cidade_atendimento,data_hora_encontro,status")
-        .is("fornecedor_id", null).order("data_hora_encontro", { ascending: false }).limit(20);
-      setSemMot(sm ?? []);
-    })();
+    dashboardAdmin().then(({ porStatus, hoje, semMotorista }) => {
+      setPorStatus(porStatus);
+      setHoje(hoje);
+      setSemMot(semMotorista);
+    });
   }, []);
 
   return (

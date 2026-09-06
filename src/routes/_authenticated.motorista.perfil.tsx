@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { atualizarMeuPerfil, meuFornecedor, trocarMinhaSenha } from "@/lib/dados";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,10 +20,10 @@ function PerfilPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      setMe({ email: u.user?.email ?? null });
-      const { data } = await supabase.from("fornecedores").select("id,nome,telefone,cidade_atuacao").eq("user_id", u.user!.id).maybeSingle();
-      setF(data as any);
+      const fornecedor = await meuFornecedor();
+      if (!fornecedor) return;
+      setMe({ email: fornecedor.email });
+      setF(fornecedor);
     })();
   }, []);
 
@@ -33,20 +33,24 @@ function PerfilPage() {
     const telefone = (f.telefone ?? "").trim();
     if (nome.length < 2 || nome.length > 200) return toast.error("Informe um nome entre 2 e 200 caracteres.");
     if (telefone.length > 120) return toast.error("Telefone muito longo.");
-    const { error } = await supabase
-      .from("fornecedores")
-      .update({ nome, telefone: telefone || null })
-      .eq("id", f.id);
-    if (error) return toast.error(error.message);
-    toast.success("Perfil atualizado.");
+    try {
+      await atualizarMeuPerfil(nome, telefone || null);
+      toast.success("Perfil atualizado.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
   async function trocarSenha() {
     if (novaSenha.length < 8) return toast.error("Mínimo 8 caracteres.");
     setBusy(true);
-    const { error } = await supabase.auth.updateUser({ password: novaSenha });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    setNovaSenha(""); toast.success("Senha alterada.");
+    try {
+      await trocarMinhaSenha(novaSenha);
+      setNovaSenha(""); toast.success("Senha alterada.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (!f) return <div className="p-6 text-sm text-muted-foreground">Carregando…</div>;

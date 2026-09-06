@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { entrarSessao, sessaoAtiva } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,8 +23,8 @@ function AuthPage() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/", replace: true });
+    sessaoAtiva().then((ativa) => {
+      if (ativa) navigate({ to: "/", replace: true });
     });
   }, [navigate]);
 
@@ -32,10 +32,14 @@ function AuthPage() {
     e.preventDefault();
     setErr(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
-    setLoading(false);
-    if (error) setErr(error.message);
-    else navigate({ to: "/", replace: true });
+    try {
+      await entrarSessao(email, senha);
+      navigate({ to: "/", replace: true });
+    } catch (error) {
+      setErr(error instanceof Error ? error.message : "Não foi possível entrar.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

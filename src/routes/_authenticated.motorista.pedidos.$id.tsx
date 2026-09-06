@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { pedidoDetalheMotorista, salvarObservacaoMotorista } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,12 +19,14 @@ function PedidoDetalhe() {
   const [obs, setObs] = useState("");
 
   async function load() {
-    const { data, error } = await supabase.from("pedidos").select(`
-      *, canais_venda(nome), categorias_veiculo(nome), fornecedores(nome)
-    `).eq("id", Number(id)).maybeSingle();
-    if (error) return toast.error(error.message);
+    let data: any;
+    try {
+      data = await pedidoDetalheMotorista(Number(id));
+    } catch (e: any) {
+      return toast.error(e?.message ?? "Erro ao carregar pedido");
+    }
     if (!data) return toast.error("Pedido não encontrado ou sem acesso");
-    setP(data); setObs((data as any).observacao_motorista ?? "");
+    setP(data); setObs(data.observacao_motorista ?? "");
   }
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
 
@@ -34,9 +36,12 @@ function PedidoDetalhe() {
   const proximoAcao = transicoes[0]; // ex: aceita_motorista, em_atendimento, corrida_finalizada
 
   async function salvarObs() {
-    const { error } = await supabase.from("pedidos").update({ observacao_motorista: obs }).eq("id", p.id);
-    if (error) return toast.error(error.message);
-    toast.success("Observação salva.");
+    try {
+      await salvarObservacaoMotorista(p.id, obs);
+      toast.success("Observação salva.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
   async function aplicar(s: PedidoStatus) {
     try { await transicionarStatus(p.id, s); toast.success("Status atualizado."); load(); }

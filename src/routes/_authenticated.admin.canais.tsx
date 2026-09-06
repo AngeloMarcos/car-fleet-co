@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { atualizarCanal, criarCanal, listarCanais } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,9 +25,13 @@ function CanaisPage() {
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase.from("canais_venda").select("*").order("nome");
-    if (error) toast.error(error.message);
-    setRows((data as Row[]) ?? []); setLoading(false);
+    try {
+      setRows(await listarCanais());
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(() => { load(); }, []);
 
@@ -36,17 +40,22 @@ function CanaisPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const { error } = edit
-      ? await supabase.from("canais_venda").update(form).eq("id", edit.id)
-      : await supabase.from("canais_venda").insert(form);
-    if (error) return toast.error(error.message);
-    toast.success(edit ? "Canal atualizado." : "Canal criado.");
-    setOpen(false); load();
+    try {
+      if (edit) await atualizarCanal(edit.id, form);
+      else await criarCanal(form.nome, form.tipo);
+      toast.success(edit ? "Canal atualizado." : "Canal criado.");
+      setOpen(false); load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
   async function toggle(r: Row) {
-    const { error } = await supabase.from("canais_venda").update({ ativo: !r.ativo }).eq("id", r.id);
-    if (error) return toast.error(error.message);
-    load();
+    try {
+      await atualizarCanal(r.id, { ativo: !r.ativo });
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
 
   return (

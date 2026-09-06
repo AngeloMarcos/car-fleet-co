@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
-import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
-import { importarPedidos } from "@/lib/pedidos.functions";
+import { importarPedidos, verificarCodigosExistentes } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +80,6 @@ export function ImportPedidosDialog({
   const [parsing, setParsing] = useState(false);
   const [importing, setImporting] = useState(false);
   const [fileName, setFileName] = useState<string>("");
-  const enviarImportacao = useServerFn(importarPedidos);
 
   const validCount = useMemo(() => rows.filter((r, i) => r.ok && !r.duplicate && selected[i]).length, [rows, selected]);
 
@@ -96,12 +93,8 @@ export function ImportPedidosDialog({
 
       // pegar códigos existentes para marcar duplicados
       const codigos = raw.map((r) => String(r["Nº Pedido"] ?? "").trim()).filter(Boolean);
-      const existing = new Set<string>();
-      if (codigos.length) {
-        const { data } = await supabase.from("pedidos")
-          .select("codigo_reserva_canal").in("codigo_reserva_canal", codigos);
-        (data ?? []).forEach((d: any) => d.codigo_reserva_canal && existing.add(String(d.codigo_reserva_canal)));
-      }
+      const existentes = codigos.length ? await verificarCodigosExistentes(codigos) : [];
+      const existing = new Set(existentes);
 
       const parsed: ParsedRow[] = raw.map((r) => {
         const tipo = String(r["Tipo Serviço"] ?? "").toUpperCase();
@@ -182,7 +175,7 @@ export function ImportPedidosDialog({
     if (payload.length === 0) return toast.error("Nenhuma linha válida selecionada.");
     setImporting(true);
     try {
-      const res = await enviarImportacao({ data: { rows: payload } });
+      const res = await importarPedidos(payload as any);
       toast.success(
         `${res.inseridos} pedidos importados${res.ignorados > 0 ? ` • ${res.ignorados} ignorados (duplicados)` : ""}.`,
       );

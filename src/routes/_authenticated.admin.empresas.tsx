@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { atualizarEmpresa, criarEmpresa, listarEmpresas } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,9 +24,13 @@ function EmpresasPage() {
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase.from("empresas_clientes").select("*").order("nome");
-    if (error) toast.error(error.message);
-    setRows((data as Row[]) ?? []); setLoading(false);
+    try {
+      setRows(await listarEmpresas());
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(() => { load(); }, []);
 
@@ -36,18 +40,23 @@ function EmpresasPage() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const payload = { nome: form.nome, documento: form.documento || null, email_contato: form.email_contato || null, telefone_contato: form.telefone_contato || null };
-    const { error } = edit
-      ? await supabase.from("empresas_clientes").update(payload).eq("id", edit.id)
-      : await supabase.from("empresas_clientes").insert(payload);
-    if (error) return toast.error(error.message);
-    toast.success(edit ? "Empresa atualizada." : "Empresa criada.");
-    setOpen(false); load();
+    try {
+      if (edit) await atualizarEmpresa(edit.id, payload);
+      else await criarEmpresa(payload);
+      toast.success(edit ? "Empresa atualizada." : "Empresa criada.");
+      setOpen(false); load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
 
   async function toggle(r: Row) {
-    const { error } = await supabase.from("empresas_clientes").update({ ativo: !r.ativo }).eq("id", r.id);
-    if (error) return toast.error(error.message);
-    load();
+    try {
+      await atualizarEmpresa(r.id, { ativo: !r.ativo });
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    }
   }
 
   return (

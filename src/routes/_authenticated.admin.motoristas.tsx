@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { createMotorista, removerMotorista } from "@/lib/motoristas.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { criarNovoMotorista, listarFornecedores, removerCadastroMotorista } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,8 +23,6 @@ export const Route = createFileRoute("/_authenticated/admin/motoristas")({
 });
 
 function MotoristasPage() {
-  const create = useServerFn(createMotorista);
-  const remove = useServerFn(removerMotorista);
   const [rows, setRows] = useState<Fornecedor[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -38,13 +34,13 @@ function MotoristasPage() {
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("fornecedores")
-      .select("id, nome, email, telefone, cidade_atuacao, ativo")
-      .order("nome");
-    if (error) toast.error(error.message);
-    setRows(data ?? []);
-    setLoading(false);
+    try {
+      setRows(await listarFornecedores());
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -53,7 +49,7 @@ function MotoristasPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      await create({ data: form });
+      await criarNovoMotorista(form);
       toast.success("Motorista criado.");
       setOpen(false);
       setForm({ nome: "", email: "", senha: "", telefone: "", cidade_atuacao: "", regiao_atuacao: "", observacoes_internas: "" });
@@ -69,7 +65,7 @@ function MotoristasPage() {
     if (!confirm(`Remover o acesso do motorista "${f.nome}"? Se ele tiver pedidos, o cadastro será desativado e o login revogado.`)) return;
     setRemovendo(f.id);
     try {
-      const res = await remove({ data: { fornecedor_id: f.id } });
+      const res = await removerCadastroMotorista(f.id);
       toast.success(res.removido ? "Motorista removido." : "Motorista desativado e login revogado.");
       load();
     } catch (e: any) {

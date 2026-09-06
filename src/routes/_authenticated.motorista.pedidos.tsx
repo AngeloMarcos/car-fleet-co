@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listarCanais, listarPedidosMotorista } from "@/lib/dados";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -29,32 +29,29 @@ function PesquisarPage() {
   });
 
   useEffect(() => {
-    (async () => {
-      const c = await supabase.from("canais_venda").select("id,nome").eq("ativo", true).order("nome");
-      setCanais((c.data as any) ?? []);
-    })();
+    listarCanais(true).then(setCanais as any);
   }, []);
 
   async function load() {
     setLoading(true);
-    let q = supabase.from("pedidos").select(`
-      id, codigo_reserva_canal, cidade_atendimento, hotel, data_hora_encontro, direcao, status, passageiro_nome,
-      empresa_nome, canais_venda(nome)
-    `).order("data_hora_encontro", { ascending: false }).limit(200);
-    if (f.codigo) q = q.ilike("codigo_reserva_canal", `%${f.codigo}%`);
-    if (f.canal !== "any") q = q.eq("canal_venda_id", f.canal);
-    if (f.status !== "any") q = q.eq("status", f.status as PedidoStatus);
-    if (f.direcao !== "any") q = q.eq("direcao", f.direcao as PedidoDirecao);
-    if (f.passageiro) q = q.ilike("passageiro_nome", `%${f.passageiro}%`);
-    if (f.cidade) q = q.ilike("cidade_atendimento", `%${f.cidade}%`);
-    if (f.de || f.ate) {
-      const col = f.tipoData === "atividade" ? "data_hora_encontro" : f.tipoData === "emissao" ? "data_emissao" : "data_alteracao";
-      if (f.de) q = q.gte(col, new Date(f.de).toISOString());
-      if (f.ate) { const d = new Date(f.ate); d.setHours(23,59,59,999); q = q.lte(col, d.toISOString()); }
+    try {
+      const data = await listarPedidosMotorista({
+        codigo: f.codigo || undefined,
+        canal: f.canal !== "any" ? f.canal : undefined,
+        status: f.status !== "any" ? (f.status as PedidoStatus) : undefined,
+        direcao: f.direcao !== "any" ? (f.direcao as PedidoDirecao) : undefined,
+        passageiro: f.passageiro || undefined,
+        cidade: f.cidade || undefined,
+        tipoData: f.tipoData,
+        de: f.de || undefined,
+        ate: f.ate || undefined,
+      });
+      setRows(data as any);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setLoading(false);
     }
-    const { data, error } = await q;
-    if (error) toast.error(error.message);
-    setRows((data as any) ?? []); setLoading(false);
   }
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, []);

@@ -1,8 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { getMyRole } from "@/lib/auth.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { obterMeuPapel, sairSessao } from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { LogOut, LayoutDashboard, Users, Building2, Radio, Car, ClipboardList } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -16,21 +14,20 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const navigate = useNavigate();
   const router = useRouter();
-  const fetchRole = useServerFn(getMyRole);
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    fetchRole().then(({ role }) => {
+    obterMeuPapel().then(({ role }) => {
       if (role !== "admin") {
         navigate({ to: role === "motorista" ? "/motorista" : "/auth", replace: true });
       } else {
         setChecked(true);
       }
     });
-  }, [fetchRole, navigate]);
+  }, [navigate]);
 
   async function logout() {
-    await supabase.auth.signOut();
+    await sairSessao();
     router.invalidate();
     navigate({ to: "/auth", replace: true });
   }

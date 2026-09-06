@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  criarPedido,
+  listarCanais,
+  listarCategorias,
+  listarEmpresas,
+  listarFornecedoresAtivos,
+  listarPedidosAdmin,
+} from "@/lib/dados";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,45 +63,39 @@ function PedidosPage() {
 
   async function loadLookups() {
     const [e, c, fo, ca] = await Promise.all([
-      supabase.from("empresas_clientes").select("id,nome").eq("ativo", true).order("nome"),
-      supabase.from("canais_venda").select("id,nome").eq("ativo", true).order("nome"),
-      supabase.from("fornecedores").select("id,nome,cidade_atuacao").eq("ativo", true).order("nome"),
-      supabase.from("categorias_veiculo").select("id,nome").eq("ativo", true).order("nome"),
+      listarEmpresas(true),
+      listarCanais(true),
+      listarFornecedoresAtivos(),
+      listarCategorias(true),
     ]);
-    setEmpresas((e.data as Lookup[]) ?? []);
-    setCanais((c.data as Lookup[]) ?? []);
-    setFornecedores((fo.data as any) ?? []);
-    setCategorias((ca.data as Lookup[]) ?? []);
+    setEmpresas(e);
+    setCanais(c);
+    setFornecedores(fo as any);
+    setCategorias(ca);
   }
 
   async function load() {
     setLoading(true);
-    let q = supabase.from("pedidos").select(`
-      id, codigo_reserva_canal, empresa_cliente_id, canal_venda_id, cidade_atendimento, hotel,
-      data_hora_encontro, data_emissao, data_alteracao, direcao, passageiro_nome, fornecedor_id, status,
-      empresas_clientes(nome), canais_venda(nome), fornecedores(nome)
-    `).order("data_hora_encontro", { ascending: false }).limit(500);
-
-    if (f.codigo) q = q.ilike("codigo_reserva_canal", `%${f.codigo}%`);
-    if (f.canal !== "any") q = q.eq("canal_venda_id", f.canal);
-    if (f.status !== "any") q = q.eq("status", f.status as PedidoStatus);
-    if (f.empresa !== "any") q = q.eq("empresa_cliente_id", f.empresa);
-    if (f.fornecedor !== "any") {
-      if (f.fornecedor === "none") q = q.is("fornecedor_id", null);
-      else q = q.eq("fornecedor_id", f.fornecedor);
+    try {
+      const data = await listarPedidosAdmin({
+        codigo: f.codigo || undefined,
+        canal: f.canal !== "any" ? f.canal : undefined,
+        status: f.status !== "any" ? (f.status as PedidoStatus) : undefined,
+        empresa: f.empresa !== "any" ? f.empresa : undefined,
+        fornecedor: f.fornecedor !== "any" ? f.fornecedor : undefined,
+        direcao: f.direcao !== "any" ? (f.direcao as PedidoDirecao) : undefined,
+        passageiro: f.passageiro || undefined,
+        cidade: f.cidade || undefined,
+        tipoData: f.tipoData,
+        de: f.de || undefined,
+        ate: f.ate || undefined,
+      });
+      setRows(data as any);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setLoading(false);
     }
-    if (f.direcao !== "any") q = q.eq("direcao", f.direcao as PedidoDirecao);
-    if (f.passageiro) q = q.ilike("passageiro_nome", `%${f.passageiro}%`);
-    if (f.cidade) q = q.ilike("cidade_atendimento", `%${f.cidade}%`);
-    if (f.de || f.ate) {
-      const col = f.tipoData === "atividade" ? "data_hora_encontro" : f.tipoData === "emissao" ? "data_emissao" : "data_alteracao";
-      if (f.de) q = q.gte(col, new Date(f.de).toISOString());
-      if (f.ate) { const d = new Date(f.ate); d.setHours(23,59,59,999); q = q.lte(col, d.toISOString()); }
-    }
-
-    const { data, error } = await q;
-    if (error) toast.error(error.message);
-    setRows((data as any) ?? []); setLoading(false);
   }
 
   useEffect(() => { loadLookups(); }, []);
@@ -213,19 +214,30 @@ function NovoPedidoDialog({ empresas, canais, categorias, onDone }: {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true);
-    const payload: any = { ...form };
-    const notaInterna = payload.observacoes_internas;
-    delete payload.observacoes_internas;
-    ["empresa_cliente_id","canal_venda_id","categoria_veiculo_id","hotel","passageiro_telefone","ponto_partida","ponto_chegada","numero_voo","codigo_reserva_canal"]
-      .forEach((k) => { if (!payload[k]) payload[k] = null; });
-    payload.data_hora_encontro = new Date(form.data_hora_encontro).toISOString();
-    const { data: novo, error } = await supabase.from("pedidos").insert(payload).select("id").single();
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    if (novo && notaInterna) {
-      await supabase.from("pedidos_notas_internas").insert({ pedido_id: novo.id, observacoes_internas: notaInterna });
+    const nulo = (v: string) => v || null;
+    try {
+      await criarPedido({
+        codigo_reserva_canal: nulo(form.codigo_reserva_canal),
+        empresa_cliente_id: nulo(form.empresa_cliente_id),
+        canal_venda_id: nulo(form.canal_venda_id),
+        cidade_atendimento: form.cidade_atendimento,
+        hotel: nulo(form.hotel),
+        data_hora_encontro: new Date(form.data_hora_encontro).toISOString(),
+        direcao: form.direcao,
+        passageiro_nome: form.passageiro_nome,
+        passageiro_telefone: nulo(form.passageiro_telefone),
+        ponto_partida: nulo(form.ponto_partida),
+        ponto_chegada: nulo(form.ponto_chegada),
+        numero_voo: nulo(form.numero_voo),
+        categoria_veiculo_id: nulo(form.categoria_veiculo_id),
+        observacoes_internas: form.observacoes_internas,
+      });
+      toast.success("Pedido criado."); onDone();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro");
+    } finally {
+      setBusy(false);
     }
-    toast.success("Pedido criado."); onDone();
   }
 
   return (
