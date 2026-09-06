@@ -1,0 +1,38 @@
+# Stack do car-fleet-co na VPS: app + Postgres.
+# Copie .env.example para .env e ajuste antes de subir. Mesmo formato do
+# projeto irmão Dias Transporte (que já roda assim em produção).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-carfleet}
+      POSTGRES_USER: ${POSTGRES_USER:-carfleet_migration}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-carfleet_migration} -d ${POSTGRES_DB:-carfleet}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Sem ports: publicado só na rede interna. Para pg_dump remoto, use SSH tunnel.
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?defina DATABASE_URL no .env}
+      DATABASE_URL_MIGRATION: ${DATABASE_URL_MIGRATION:-}
+      SESSION_SECRET: ${SESSION_SECRET:?defina SESSION_SECRET no .env}
+      APP_URL: ${APP_URL:?defina APP_URL no .env}
+      VITE_AUTH_MODE: vps
+      PORT: 3000
+    ports:
+      - "127.0.0.1:3001:3000" # 3001 pra nao colidir com o Dias Transporte na mesma VPS
+
+volumes:
+  db:

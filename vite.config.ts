@@ -39,7 +39,11 @@ export default defineConfig(async ({ command, mode }) => {
 
   if (command === "build") {
     const { nitro } = await import("nitro/vite");
-    plugins.push(nitro({ defaultPreset: "cloudflare-module" }));
+    // Deploy próprio (VPS) roda em Node puro, não Cloudflare Workers — o
+    // Dockerfile define NITRO_PRESET=node_server nesse caso (mesmo padrão do
+    // projeto irmão Dias Transporte). Sem essa variável, mantém o preset do
+    // Lovable Cloud de sempre.
+    plugins.push(nitro({ defaultPreset: process.env["NITRO_PRESET"] ?? "cloudflare-module" }));
   }
 
   plugins.push(viteReact());

@@ -9,86 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedMotoristaRouteImport } from './routes/_authenticated.motorista'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
-import { Route as AuthenticatedMotoristaIndexRouteImport } from './routes/_authenticated.motorista.index'
+import { Route as AuthenticatedMotoristaRouteImport } from './routes/_authenticated.motorista'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
-import { Route as AuthenticatedMotoristaPerfilRouteImport } from './routes/_authenticated.motorista.perfil'
-import { Route as AuthenticatedMotoristaPedidosRouteImport } from './routes/_authenticated.motorista.pedidos'
-import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated.admin.pedidos'
-import { Route as AuthenticatedAdminMotoristasRouteImport } from './routes/_authenticated.admin.motoristas'
-import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated.admin.empresas'
-import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated.admin.categorias'
 import { Route as AuthenticatedAdminCanaisRouteImport } from './routes/_authenticated.admin.canais'
-import { Route as AuthenticatedMotoristaPedidosIdRouteImport } from './routes/_authenticated.motorista.pedidos.$id'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated.admin.categorias'
+import { Route as AuthenticatedAdminEmpresasRouteImport } from './routes/_authenticated.admin.empresas'
+import { Route as AuthenticatedAdminMotoristasRouteImport } from './routes/_authenticated.admin.motoristas'
+import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated.admin.pedidos'
+import { Route as AuthenticatedMotoristaIndexRouteImport } from './routes/_authenticated.motorista.index'
+import { Route as AuthenticatedMotoristaPedidosRouteImport } from './routes/_authenticated.motorista.pedidos'
+import { Route as AuthenticatedMotoristaPerfilRouteImport } from './routes/_authenticated.motorista.perfil'
 import { Route as AuthenticatedAdminPedidosIdRouteImport } from './routes/_authenticated.admin.pedidos.$id'
+import { Route as AuthenticatedMotoristaPedidosIdRouteImport } from './routes/_authenticated.motorista.pedidos.$id'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedMotoristaRoute = AuthenticatedMotoristaRouteImport.update({
-  id: '/motorista',
-  path: '/motorista',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMotoristaIndexRoute =
-  AuthenticatedMotoristaIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedMotoristaRoute,
-  } as any)
+const AuthenticatedMotoristaRoute = AuthenticatedMotoristaRouteImport.update({
+  id: '/motorista',
+  path: '/motorista',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedMotoristaPerfilRoute =
-  AuthenticatedMotoristaPerfilRouteImport.update({
-    id: '/perfil',
-    path: '/perfil',
-    getParentRoute: () => AuthenticatedMotoristaRoute,
-  } as any)
-const AuthenticatedMotoristaPedidosRoute =
-  AuthenticatedMotoristaPedidosRouteImport.update({
-    id: '/pedidos',
-    path: '/pedidos',
-    getParentRoute: () => AuthenticatedMotoristaRoute,
-  } as any)
-const AuthenticatedAdminPedidosRoute =
-  AuthenticatedAdminPedidosRouteImport.update({
-    id: '/pedidos',
-    path: '/pedidos',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminMotoristasRoute =
-  AuthenticatedAdminMotoristasRouteImport.update({
-    id: '/motoristas',
-    path: '/motoristas',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminEmpresasRoute =
-  AuthenticatedAdminEmpresasRouteImport.update({
-    id: '/empresas',
-    path: '/empresas',
+const AuthenticatedAdminCanaisRoute =
+  AuthenticatedAdminCanaisRouteImport.update({
+    id: '/canais',
+    path: '/canais',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCategoriasRoute =
@@ -97,23 +67,53 @@ const AuthenticatedAdminCategoriasRoute =
     path: '/categorias',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminCanaisRoute =
-  AuthenticatedAdminCanaisRouteImport.update({
-    id: '/canais',
-    path: '/canais',
+const AuthenticatedAdminEmpresasRoute =
+  AuthenticatedAdminEmpresasRouteImport.update({
+    id: '/empresas',
+    path: '/empresas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedMotoristaPedidosIdRoute =
-  AuthenticatedMotoristaPedidosIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedMotoristaPedidosRoute,
+const AuthenticatedAdminMotoristasRoute =
+  AuthenticatedAdminMotoristasRouteImport.update({
+    id: '/motoristas',
+    path: '/motoristas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPedidosRoute =
+  AuthenticatedAdminPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedMotoristaIndexRoute =
+  AuthenticatedMotoristaIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMotoristaRoute,
+  } as any)
+const AuthenticatedMotoristaPedidosRoute =
+  AuthenticatedMotoristaPedidosRouteImport.update({
+    id: '/pedidos',
+    path: '/pedidos',
+    getParentRoute: () => AuthenticatedMotoristaRoute,
+  } as any)
+const AuthenticatedMotoristaPerfilRoute =
+  AuthenticatedMotoristaPerfilRouteImport.update({
+    id: '/perfil',
+    path: '/perfil',
+    getParentRoute: () => AuthenticatedMotoristaRoute,
   } as any)
 const AuthenticatedAdminPedidosIdRoute =
   AuthenticatedAdminPedidosIdRouteImport.update({
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminPedidosRoute,
+  } as any)
+const AuthenticatedMotoristaPedidosIdRoute =
+  AuthenticatedMotoristaPedidosIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedMotoristaPedidosRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -228,11 +228,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -242,19 +242,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/motorista': {
-      id: '/_authenticated/motorista'
-      path: '/motorista'
-      fullPath: '/motorista'
-      preLoaderRoute: typeof AuthenticatedMotoristaRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -263,60 +256,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/motorista/': {
-      id: '/_authenticated/motorista/'
-      path: '/'
-      fullPath: '/motorista/'
-      preLoaderRoute: typeof AuthenticatedMotoristaIndexRouteImport
-      parentRoute: typeof AuthenticatedMotoristaRoute
+    '/_authenticated/motorista': {
+      id: '/_authenticated/motorista'
+      path: '/motorista'
+      fullPath: '/motorista'
+      preLoaderRoute: typeof AuthenticatedMotoristaRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/motorista/perfil': {
-      id: '/_authenticated/motorista/perfil'
-      path: '/perfil'
-      fullPath: '/motorista/perfil'
-      preLoaderRoute: typeof AuthenticatedMotoristaPerfilRouteImport
-      parentRoute: typeof AuthenticatedMotoristaRoute
-    }
-    '/_authenticated/motorista/pedidos': {
-      id: '/_authenticated/motorista/pedidos'
-      path: '/pedidos'
-      fullPath: '/motorista/pedidos'
-      preLoaderRoute: typeof AuthenticatedMotoristaPedidosRouteImport
-      parentRoute: typeof AuthenticatedMotoristaRoute
-    }
-    '/_authenticated/admin/pedidos': {
-      id: '/_authenticated/admin/pedidos'
-      path: '/pedidos'
-      fullPath: '/admin/pedidos'
-      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/motoristas': {
-      id: '/_authenticated/admin/motoristas'
-      path: '/motoristas'
-      fullPath: '/admin/motoristas'
-      preLoaderRoute: typeof AuthenticatedAdminMotoristasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/empresas': {
-      id: '/_authenticated/admin/empresas'
-      path: '/empresas'
-      fullPath: '/admin/empresas'
-      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/categorias': {
-      id: '/_authenticated/admin/categorias'
-      path: '/categorias'
-      fullPath: '/admin/categorias'
-      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/canais': {
@@ -326,12 +277,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCanaisRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/motorista/pedidos/$id': {
-      id: '/_authenticated/motorista/pedidos/$id'
-      path: '/$id'
-      fullPath: '/motorista/pedidos/$id'
-      preLoaderRoute: typeof AuthenticatedMotoristaPedidosIdRouteImport
-      parentRoute: typeof AuthenticatedMotoristaPedidosRoute
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/empresas': {
+      id: '/_authenticated/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AuthenticatedAdminEmpresasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/motoristas': {
+      id: '/_authenticated/admin/motoristas'
+      path: '/motoristas'
+      fullPath: '/admin/motoristas'
+      preLoaderRoute: typeof AuthenticatedAdminMotoristasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/pedidos': {
+      id: '/_authenticated/admin/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/motorista/': {
+      id: '/_authenticated/motorista/'
+      path: '/'
+      fullPath: '/motorista/'
+      preLoaderRoute: typeof AuthenticatedMotoristaIndexRouteImport
+      parentRoute: typeof AuthenticatedMotoristaRoute
+    }
+    '/_authenticated/motorista/pedidos': {
+      id: '/_authenticated/motorista/pedidos'
+      path: '/pedidos'
+      fullPath: '/motorista/pedidos'
+      preLoaderRoute: typeof AuthenticatedMotoristaPedidosRouteImport
+      parentRoute: typeof AuthenticatedMotoristaRoute
+    }
+    '/_authenticated/motorista/perfil': {
+      id: '/_authenticated/motorista/perfil'
+      path: '/perfil'
+      fullPath: '/motorista/perfil'
+      preLoaderRoute: typeof AuthenticatedMotoristaPerfilRouteImport
+      parentRoute: typeof AuthenticatedMotoristaRoute
     }
     '/_authenticated/admin/pedidos/$id': {
       id: '/_authenticated/admin/pedidos/$id'
@@ -339,6 +332,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/pedidos/$id'
       preLoaderRoute: typeof AuthenticatedAdminPedidosIdRouteImport
       parentRoute: typeof AuthenticatedAdminPedidosRoute
+    }
+    '/_authenticated/motorista/pedidos/$id': {
+      id: '/_authenticated/motorista/pedidos/$id'
+      path: '/$id'
+      fullPath: '/motorista/pedidos/$id'
+      preLoaderRoute: typeof AuthenticatedMotoristaPedidosIdRouteImport
+      parentRoute: typeof AuthenticatedMotoristaPedidosRoute
     }
   }
 }
